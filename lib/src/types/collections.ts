@@ -232,6 +232,13 @@ export interface EntityCollection<M extends Record<string, any> = any,
      */
     defaultAdditionalView?: string;
 
+    /**
+     * When this collection is a subcollection, you can specify the width that is
+     * necessary to make it useful to the user. This is used to allocate enough space
+     * when rendered as an additional view in the side panel.
+     */
+    additionalViewWidthAsSubcollection?: number | string;
+
 }
 
 /**
@@ -407,6 +414,7 @@ export type EntityCustomView<M extends Record<string, any> = any> =
     {
         path: string,
         name: string,
+        width?: number | string,
         builder: (params: EntityCustomViewParams<M>) => React.ReactNode
     }
 

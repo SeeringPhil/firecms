@@ -18,6 +18,7 @@ export const localeCollection = buildCollection<Locale>({
     customId: locales,
     name: "Locales",
     singularName: "Locale",
+    // additionalViewWidthAsSubcollection: "20vw",
     properties: {
         name: {
             name: "Name",
@@ -112,11 +113,12 @@ export const productsCollection = buildCollection<Product>({
     }),
     Actions: SampleCollectionActions,
     subcollections: [localeCollection],
-    defaultAdditionalView: "locales",
+    defaultAdditionalView: "products",
     views: [
         {
             path: "sample_custom_view",
             name: "Custom view",
+            // width: "50vw",
             builder: ({ collection, entity, modifiedValues }) =>
                 <SampleProductsView entity={entity}
                                     modifiedValues={modifiedValues}/>

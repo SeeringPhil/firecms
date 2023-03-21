@@ -280,7 +280,7 @@ export const EntityView = React.memo<EntityViewProps<any>>(
                 return (
                     <Box
                         sx={{
-                            width: ADDITIONAL_TAB_WIDTH,
+                            width: customView.width ?? CONTAINER_FULL_WIDTH,
                             height: "100%",
                             overflow: "auto",
                             borderLeft: `1px solid ${theme.palette.divider}`,
@@ -314,7 +314,7 @@ export const EntityView = React.memo<EntityViewProps<any>>(
                 return (
                     <Box
                         sx={{
-                            width: ADDITIONAL_TAB_WIDTH,
+                            width: subcollection.additionalViewWidthAsSubcollection ?? ADDITIONAL_TAB_WIDTH,
                             height: "100%",
                             overflow: "auto",
                             borderLeft: `1px solid ${theme.palette.divider}`,
@@ -371,17 +371,33 @@ export const EntityView = React.memo<EntityViewProps<any>>(
             throw Error("Something is wrong in getSelectedSubPath");
         }, [customViews, customViewsCount, subcollections]);
 
+        const getSelectedSubPathWidth = useCallback((value: number) => {
+            if (value === -1) return undefined;
+
+            if (customViews && value < customViewsCount) {
+                return customViews[value].width;
+            }
+
+            if (subcollections) {
+                return subcollections[value - customViewsCount].additionalViewWidthAsSubcollection;
+            }
+
+            throw Error("Something is wrong in getSelectedSubPathWidth");
+        }, [customViews, customViewsCount, subcollections]);
+
         const onDiscard = useCallback(() => {
             onValuesAreModified(false);
         }, []);
 
         const onSideTabClick = useCallback((value: number) => {
+            console.log("onSideTabClick", value)
             setTabsPosition(value);
             if (entityId) {
                 sideEntityController.replace({
                     path,
                     entityId,
                     selectedSubPath: getSelectedSubPath(value),
+                    width: getSelectedSubPathWidth(value),
                     updateUrl: true
                 });
             }

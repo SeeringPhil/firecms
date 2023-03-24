@@ -46,6 +46,19 @@ export interface ScaffoldProps<ExtraDrawerProps = {}> {
     logo?: string;
 
     /**
+     * In case you need to override the url displayed at the bottom of the drawer
+     *
+     * @default "https://firecms.co/?utm_source=drawer"
+     * /
+    drawerUrl?: string;
+
+    /**
+     * In case you need to override the label displayed at the bottom of the drawer
+     * @see drawerUrl
+     * @default "firecms.co"
+    drawerUrlLabel?: string;
+
+    /**
      * A component that gets rendered on the upper side of the main toolbar
      */
     toolbarExtraWidget?: React.ReactNode;
@@ -210,6 +223,8 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 function StyledDrawer(props: MuiDrawerProps & {
     logo?: string,
     setDrawerOpen: (open: boolean) => void,
+    drawerUrl?: string,
+    drawerUrlLabel?: string
 }) {
     const context = useFireCMSContext();
     const theme = useTheme();
@@ -219,6 +234,8 @@ function StyledDrawer(props: MuiDrawerProps & {
         open,
         logo,
         setDrawerOpen,
+        drawerUrl = "https://firecms.co/?utm_source=drawer",
+        drawerUrlLabel = "firecms.co",
         ...drawerProps
     } = props;
 
@@ -356,14 +373,14 @@ function StyledDrawer(props: MuiDrawerProps & {
                 backdropFilter: "blur(8px)"
                 // borderTop: `1px solid ${theme.palette.divider}`
             })}
-                  href={"https://firecms.co?utm_source=drawer"}
+                  href={drawerUrl}
                   onMouseDown={(e: React.MouseEvent) => {
                       e.preventDefault();
                   }}
                   target="_blank">
                 <OpenInNewIcon style={{ marginRight: "24px" }}
                                fontSize={"small"}/>
-                firecms.co
+                {drawerUrlLabel}
             </Link>
 
         </MuiDrawer>

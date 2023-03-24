@@ -94,6 +94,8 @@ export const Scaffold = React.memo<PropsWithChildren<ScaffoldProps>>(
             children,
             name,
             logo,
+            drawerUrl,
+            drawerUrlLabel,
             toolbarExtraWidget,
             Drawer
         } = props;
@@ -130,6 +132,8 @@ export const Scaffold = React.memo<PropsWithChildren<ScaffoldProps>>(
                 <StyledDrawer
                     open={drawerOpen}
                     logo={logo}
+                    drawerUrl={drawerUrl}
+                    drawerUrlLabel={drawerUrlLabel}
                     setDrawerOpen={setDrawerOpen}>
                     <nav>
                         {navigation.loading

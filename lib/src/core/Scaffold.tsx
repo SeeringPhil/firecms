@@ -47,15 +47,14 @@ export interface ScaffoldProps<ExtraDrawerProps = {}> {
 
     /**
      * In case you need to override the url displayed at the bottom of the drawer
-     *
      * @default "https://firecms.co/?utm_source=drawer"
-     * /
+     */
     drawerUrl?: string;
 
     /**
      * In case you need to override the label displayed at the bottom of the drawer
-     * @see drawerUrl
      * @default "firecms.co"
+     */
     drawerUrlLabel?: string;
 
     /**

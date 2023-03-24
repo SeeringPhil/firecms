@@ -15,17 +15,14 @@ export interface ScaffoldProps<ExtraDrawerProps = {}> {
     logo?: string;
     /**
      * In case you need to override the url displayed at the bottom of the drawer
-     *
      * @default "https://firecms.co/?utm_source=drawer"
-     * /
+     */
     drawerUrl?: string;
-
     /**
      * In case you need to override the label displayed at the bottom of the drawer
-     * @see drawerUrl
      * @default "firecms.co"
+     */
     drawerUrlLabel?: string;
-
     /**
      * A component that gets rendered on the upper side of the main toolbar
      */

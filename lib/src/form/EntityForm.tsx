@@ -319,10 +319,13 @@ function EntityFormInternal<M extends Record<string, any>>({
 
     return (
         <Formik
+            validateOnChange={false}
+            validateOnMount={false}
+            validateOnBlur={false}
             initialValues={baseDataSourceValues as M}
             onSubmit={saveValues}
             validationSchema={validationSchema}
-            // validate={(values) => console.debug("Validating", values)}
+            validate={(values) => console.debug("Validating", values)}
             onReset={() => onDiscard && onDiscard()}
         >
             {(props) => {

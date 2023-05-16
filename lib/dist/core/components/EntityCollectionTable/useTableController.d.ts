@@ -26,5 +26,6 @@ export type TableControllerProps<M extends Record<string, any> = any> = {
      */
     entitiesDisplayedFirst?: Entity<M>[];
     isFilterCombinationValid: (filter: FilterValues<Extract<keyof M, string>>, sort?: [string, "asc" | "desc"], filterCombinations?: FilterCombination<Extract<keyof M, string>>[]) => boolean;
+    lastDeleteTimestamp?: number;
 };
-export declare function useTableController<M extends Record<string, any> = any, UserType extends User = User>({ fullPath, collection, entitiesDisplayedFirst, isFilterCombinationValid }: TableControllerProps<M>): TableController<M>;
+export declare function useTableController<M extends Record<string, any> = any, UserType extends User = User>({ fullPath, collection, entitiesDisplayedFirst, isFilterCombinationValid, lastDeleteTimestamp }: TableControllerProps<M>): TableController<M>;

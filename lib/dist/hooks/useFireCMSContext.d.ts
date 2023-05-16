@@ -1,6 +1,6 @@
 /// <reference types="react" />
 import { AuthController, FireCMSContext, User } from "../types";
-export declare const FireCMSContextInstance: import("react").Context<Partial<FireCMSContext<User, AuthController<User>>>>;
+export declare const FireCMSContextInstance: import("react").Context<Partial<FireCMSContext>>;
 /**
  * Hook to retrieve the {@link FireCMSContext}.
  *

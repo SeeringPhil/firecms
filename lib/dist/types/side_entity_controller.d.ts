@@ -1,12 +1,11 @@
 import { EntityCollection } from "./collections";
-import { User } from "./user";
 import { ResolvedEntityCollection } from "./resolved_entities";
 import { Entity } from "./entities";
 /**
  * Props used to open a side dialog
  * @category Hooks and utilities
  */
-export interface EntitySidePanelProps<M extends Record<string, any> = any, UserType extends User = User> {
+export interface EntitySidePanelProps<M extends Record<string, any> = any> {
     /**
      * Absolute path of the entity
      */
@@ -75,10 +74,10 @@ export interface SideEntityController {
      * (or a new one with that id).
      * @param props
      */
-    open: <M extends Record<string, any> = any, UserType extends User = User>(props: EntitySidePanelProps<M, UserType>) => void;
+    open: <M extends Record<string, any> = any>(props: EntitySidePanelProps<M>) => void;
     /**
      * Replace the last open entity panel with the given one.
      * @param props
      */
-    replace: <M extends Record<string, any> = any, UserType extends User = User>(props: EntitySidePanelProps<M, UserType>) => void;
+    replace: <M extends Record<string, any> = any>(props: EntitySidePanelProps<M>) => void;
 }

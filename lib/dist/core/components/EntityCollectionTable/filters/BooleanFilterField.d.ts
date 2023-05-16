@@ -1,4 +1,4 @@
-import { TableWhereFilterOp } from "../VirtualTableProps";
+import { TableWhereFilterOp } from "../../Table";
 interface BooleanFieldProps {
     name: string;
     value?: [op: TableWhereFilterOp, fieldValue: any];

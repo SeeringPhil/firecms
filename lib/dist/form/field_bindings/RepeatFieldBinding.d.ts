@@ -7,4 +7,4 @@ import { FieldProps } from "../../types";
  * and tables to the specified properties.
  * @category Form fields
  */
-export declare function RepeatFieldBinding<T extends Array<any>>({ propertyKey, value, error, showError, isSubmitting, setValue, tableMode, property, includeDescription, underlyingValueHasChanged, context, disabled, shouldAlwaysRerender }: FieldProps<T>): import("@emotion/react/jsx-runtime").JSX.Element;
+export declare function RepeatFieldBinding<T extends Array<any>>({ propertyKey, value, error, showError, isSubmitting, setValue, tableMode, property, includeDescription, underlyingValueHasChanged, context, disabled }: FieldProps<T>): import("@emotion/react/jsx-runtime").JSX.Element;

@@ -1,13 +1,18 @@
+import React, { PropsWithChildren } from "react";
 import { FireCMSContext } from "./firecms_context";
 import { CollectionActionsProps, EntityCollection } from "./collections";
 import { User } from "./user";
-import { PropsWithChildren } from "react";
+import { FieldConfigId } from "./field_config";
+import { FieldProps, FormContext } from "./fields";
+import { CMSType, Property } from "./properties";
+import { EntityStatus } from "./entities";
+import { ResolvedProperty } from "./resolved_entities";
 /**
  * Interface used to define plugins for FireCMS.
  * NOTE: This is a work in progress and the API is not stable yet.
  * @category Core
  */
-export type FireCMSPlugin<T = any> = {
+export type FireCMSPlugin<PROPS = any, FORM_PROPS = any> = {
     /**
      * Name of the plugin
      */
@@ -32,6 +37,15 @@ export type FireCMSPlugin<T = any> = {
          */
         CollectionActions?: React.ComponentType<CollectionActionsProps> | React.ComponentType<CollectionActionsProps>[];
     };
+    form?: {
+        provider?: {
+            Component: React.ComponentType<PropsWithChildren<FORM_PROPS & PluginFormActionProps<any>>>;
+            props?: FORM_PROPS;
+        };
+        Actions?: React.ComponentType<PluginFormActionProps>;
+        fieldBuilder?: <T extends CMSType = CMSType>(props: PluginFieldBuilderParams<T>) => React.ComponentType<FieldProps<T>> | null;
+        fieldBuilderEnabled?: <T extends CMSType = CMSType>(props: PluginFieldBuilderParams<T>) => boolean;
+    };
     /**
      * You can use this prop to add higher order components to the CMS.
      * The components will be added to the root of the CMS, so any component
@@ -41,27 +55,31 @@ export type FireCMSPlugin<T = any> = {
      * you can use the hooks provided by the CMS.
      * @param props
      */
-    wrapperComponent?: {
-        Component: React.ComponentType<PropsWithChildren<T & {
+    provider?: {
+        Component: React.ComponentType<PropsWithChildren<PROPS & {
             context: FireCMSContext;
         }>>;
-        props?: T;
+        props?: PROPS;
     };
     homePage?: {
         /**
          * Use this component to add custom actions to the navigation card
          * in the home page.
          */
-        CollectionActions?: React.ComponentType<HomePageActionsProps>;
+        CollectionActions?: React.ComponentType<PluginHomePageActionsProps>;
+        /**
+         * Additional props passed to `CollectionActions`
+         */
+        extraProps?: any;
         /**
          * Add additional cards to each collection group in the home page.
          */
-        AdditionalCards?: React.ComponentType<HomePageAdditionalCardsProps> | React.ComponentType<HomePageAdditionalCardsProps>[];
+        AdditionalCards?: React.ComponentType<PluginHomePageAdditionalCardsProps> | React.ComponentType<PluginHomePageAdditionalCardsProps>[];
         /**
          * Include a section in the home page with a custom component and title.
          * @param props
          */
-        includeSection?: (props: GenericPluginProps) => {
+        includeSection?: (props: PluginGenericProps) => {
             title: string;
             children: React.ReactNode;
         };
@@ -73,7 +91,7 @@ export type FireCMSPlugin<T = any> = {
  *
  * @category Models
  */
-export interface HomePageActionsProps<M extends Record<string, any> = any, UserType extends User = User, EC extends EntityCollection<M> = EntityCollection<M>> {
+export interface PluginHomePageActionsProps<EP extends object = object, M extends Record<string, any> = any, UserType extends User = User, EC extends EntityCollection<M> = EntityCollection<M>> {
     /**
      * Collection path of this entity. This is the full path, like
      * `users/1234/addresses`
@@ -87,11 +105,30 @@ export interface HomePageActionsProps<M extends Record<string, any> = any, UserT
      * Context of the app status
      */
     context: FireCMSContext<UserType>;
+    extraProps?: EP;
 }
-export interface GenericPluginProps<UserType extends User = User> {
+export interface PluginFormActionProps<UserType extends User = User> {
+    entityId?: string;
+    path: string;
+    status: EntityStatus;
+    collection: EntityCollection;
+    formContext: FormContext<any>;
+    context: FireCMSContext<UserType>;
+    currentEntityId?: string;
+}
+export type PluginFieldBuilderParams<T extends CMSType = CMSType, M extends Record<string, any> = any> = {
+    fieldConfigId: FieldConfigId;
+    propertyKey: string;
+    property: Property<T> | ResolvedProperty<T>;
+    Field: React.ComponentType<FieldProps<T, any, M>>;
+    plugin: FireCMSPlugin;
+    path: string;
+    collection: EntityCollection<M>;
+};
+export interface PluginGenericProps<UserType extends User = User> {
     context: FireCMSContext<UserType>;
 }
-export interface HomePageAdditionalCardsProps<UserType extends User = User> {
+export interface PluginHomePageAdditionalCardsProps<UserType extends User = User> {
     group?: string;
     context: FireCMSContext<UserType>;
 }

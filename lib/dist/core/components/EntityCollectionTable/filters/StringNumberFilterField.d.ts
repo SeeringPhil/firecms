@@ -1,4 +1,4 @@
-import { TableEnumValues, TableWhereFilterOp } from "../VirtualTableProps";
+import { TableEnumValues, TableWhereFilterOp } from "../../Table";
 interface StringNumberFilterFieldProps {
     name: string;
     dataType: "string" | "number";

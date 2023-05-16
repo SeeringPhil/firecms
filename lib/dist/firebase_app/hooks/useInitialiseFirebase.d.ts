@@ -24,8 +24,9 @@ export interface InitialiseFirebaseResult {
  * @param name
  * @category Firebase
  */
-export declare function useInitialiseFirebase({ firebaseConfig, onFirebaseInit, name }: {
+export declare function useInitialiseFirebase({ firebaseConfig, onFirebaseInit, name, authDomain }: {
     onFirebaseInit?: ((config: object) => void) | undefined;
     firebaseConfig: Record<string, unknown> | undefined;
     name?: string;
+    authDomain?: string;
 }): InitialiseFirebaseResult;

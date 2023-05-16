@@ -5,6 +5,7 @@ import { SvgIconTypeMap } from "@mui/material";
  * @category Core
  */
 export type DrawerProps<T = {}> = T & {
+    hovered: boolean;
     drawerOpen: boolean;
     closeDrawer: () => any;
 };
@@ -12,7 +13,7 @@ export type DrawerProps<T = {}> = T & {
  * Default drawer used in the CMS
  * @category Core
  */
-export declare function Drawer({ drawerOpen, closeDrawer }: DrawerProps): import("@emotion/react/jsx-runtime").JSX.Element;
+export declare function Drawer({ hovered, drawerOpen, closeDrawer }: DrawerProps): import("@emotion/react/jsx-runtime").JSX.Element;
 export declare function DrawerNavigationItem({ name, Icon, drawerOpen, tooltipsOpen, url, onClick }: {
     Icon: React.ComponentType<SvgIconTypeMap["props"]>;
     name: string;

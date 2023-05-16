@@ -1,5 +1,5 @@
 import { User as FirebaseUser } from "firebase/auth";
-import { DataSource, StorageSource } from "../../types";
+import { AppCheckTokenResult, DataSource, StorageSource } from "../../types";
 import { Authenticator, FirebaseAuthController } from "../types/auth";
 /**
  * This hook is used internally for validating an authenticator.
@@ -7,12 +7,15 @@ import { Authenticator, FirebaseAuthController } from "../types/auth";
  * building your own custom {@link FireCMS} instance.
  * @param authController
  * @param authentication
+ * @param getAppCheckToken
  * @param storageSource
  * @param dataSource
  */
-export declare function useValidateAuthenticator({ authController, authentication, storageSource, dataSource }: {
+export declare function useValidateAuthenticator({ authController, authentication, getAppCheckToken, appCheckForceRefresh, storageSource, dataSource }: {
     authController: FirebaseAuthController;
     authentication?: boolean | Authenticator<FirebaseUser>;
+    getAppCheckToken?: (forceRefresh: boolean) => Promise<AppCheckTokenResult> | undefined;
+    appCheckForceRefresh?: boolean;
     dataSource: DataSource;
     storageSource: StorageSource;
 }): {

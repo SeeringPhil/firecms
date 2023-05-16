@@ -8,5 +8,5 @@ type SelectProps<T extends EnumType> = FieldProps<T>;
  * and tables to the specified properties.
  * @category Form fields
  */
-export declare function SelectFieldBinding<T extends EnumType>({ propertyKey, value, setValue, error, showError, disabled, autoFocus, touched, property, includeDescription, shouldAlwaysRerender }: SelectProps<T>): import("@emotion/react/jsx-runtime").JSX.Element;
+export declare function SelectFieldBinding<T extends EnumType>({ propertyKey, value, setValue, error, showError, disabled, autoFocus, touched, property, includeDescription }: SelectProps<T>): import("@emotion/react/jsx-runtime").JSX.Element;
 export {};

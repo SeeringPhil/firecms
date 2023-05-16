@@ -6,4 +6,4 @@ import { FieldProps } from "../../types";
  * and tables to the specified properties.
  * @category Form fields
  */
-export declare function MapFieldBinding<T extends Record<string, any>>({ propertyKey, value, showError, disabled, property, setValue, tableMode, includeDescription, underlyingValueHasChanged, autoFocus, shouldAlwaysRerender, context }: FieldProps<T>): import("@emotion/react/jsx-runtime").JSX.Element;
+export declare function MapFieldBinding<T extends Record<string, any>>({ propertyKey, value, showError, disabled, property, setValue, tableMode, includeDescription, underlyingValueHasChanged, autoFocus, context }: FieldProps<T>): import("@emotion/react/jsx-runtime").JSX.Element;

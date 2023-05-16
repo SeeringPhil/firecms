@@ -1,7 +1,8 @@
-import { Property, ResolvedProperty } from "../../types";
+import React from "react";
 import { SxProps, Theme } from "@mui/material";
 interface LabelWithIconProps {
-    property: Property | ResolvedProperty;
+    icon: React.ReactNode;
+    title?: string;
     small?: boolean;
     sx?: SxProps<Theme>;
 }
@@ -10,5 +11,5 @@ interface LabelWithIconProps {
  * icon
  * @category Form custom fields
  */
-export declare function LabelWithIcon({ property, small, sx }: LabelWithIconProps): import("@emotion/react/jsx-runtime").JSX.Element;
+export declare function LabelWithIcon({ icon, title, small, sx }: LabelWithIconProps): import("@emotion/react/jsx-runtime").JSX.Element;
 export {};

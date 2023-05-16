@@ -15,7 +15,7 @@ export interface StorageFieldItem {
     metadata?: any;
     size: PreviewSize;
 }
-export declare function useStorageUploadController<M>({ entityId, entityValues, path, value, property, propertyKey, storageSource, disabled, onChange }: {
+export declare function useStorageUploadController<M extends object>({ entityId, entityValues, path, value, property, propertyKey, storageSource, disabled, onChange }: {
     entityId: string;
     entityValues: EntityValues<M>;
     value: string | string[] | null;

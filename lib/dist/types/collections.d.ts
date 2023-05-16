@@ -197,7 +197,15 @@ export interface EntityCollection<M extends Record<string, any> = any, Additiona
      * that has a custom view as well as a subcollection that refers to another entity, you can
      * either specify the path to the custom view or the path to the subcollection.
      */
-    defaultAdditionalView?: string;
+    defaultSelectedView?: string;
+    /**
+     * Should the ID of this collection be hidden from the form view.
+     */
+    hideIdFromForm?: boolean;
+    /**
+     * Should the ID of this collection be hidden from the grid view.
+     */
+    hideIdFromCollection?: boolean;
 }
 /**
  * Parameter passed to the `Actions` prop in the collection configuration.
@@ -251,7 +259,7 @@ export type SelectionController<M extends Record<string, any> = any> = {
  * strings '<', '<=', '==', '>=', '>', 'array-contains', 'in', and 'array-contains-any'.
  * @category Models
  */
-export type WhereFilterOp = "<" | "<=" | "==" | "!=" | ">=" | ">" | "array-contains" | "in" | "array-contains-any";
+export type WhereFilterOp = "<" | "<=" | "==" | "!=" | ">=" | ">" | "array-contains" | "in" | "not-in" | "array-contains-any";
 /**
  * Used to define filters applied in collections
  * @category Models
@@ -341,7 +349,11 @@ export interface AdditionalFieldDelegate<M extends Record<string, any> = any, Ad
 export type EntityCustomView<M extends Record<string, any> = any> = {
     path: string;
     name: string;
-    builder: (params: EntityCustomViewParams<M>) => React.ReactNode;
+    /**
+     * DEPRECATED: Use `Builder` instead
+     */
+    builder?: React.ComponentType<EntityCustomViewParams<M>>;
+    Builder?: React.ComponentType<EntityCustomViewParams<M>>;
 };
 /**
  * Parameters passed to the builder in charge of rendering a custom panel for

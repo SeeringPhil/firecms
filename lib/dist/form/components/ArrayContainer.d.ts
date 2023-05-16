@@ -8,9 +8,10 @@ interface ArrayContainerProps<T> {
     small?: boolean;
     onInternalIdAdded?: (id: number) => void;
     includeAddButton?: boolean;
+    newDefaultEntry?: T | null;
 }
 /**
  * @category Form custom fields
  */
-export declare function ArrayContainer<T>({ name, addLabel, value, disabled, buildEntry, small, onInternalIdAdded, includeAddButton }: ArrayContainerProps<T>): import("@emotion/react/jsx-runtime").JSX.Element;
+export declare function ArrayContainer<T>({ name, addLabel, value, disabled, buildEntry, small, onInternalIdAdded, includeAddButton, newDefaultEntry }: ArrayContainerProps<T>): import("@emotion/react/jsx-runtime").JSX.Element;
 export {};

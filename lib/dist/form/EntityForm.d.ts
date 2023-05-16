@@ -1,4 +1,4 @@
-import { Entity, EntityCollection, EntityStatus, EntityValues, ResolvedEntityCollection } from "../types";
+import { Entity, EntityCollection, EntityStatus, EntityValues, FormContext, ResolvedEntityCollection } from "../types";
 /**
  * @category Components
  */
@@ -44,6 +44,14 @@ export interface EntityFormProps<M extends Record<string, any>> {
      * The callback function when the form original values have been modified
      */
     onValuesChanged?: (values?: EntityValues<M>) => void;
+    /**
+     *
+     * @param id
+     */
+    onIdChange?: (id: string) => void;
+    currentEntityId?: string;
+    onFormContextChange?: (formContext: FormContext<M>) => void;
+    hideId?: boolean;
 }
 /**
  * This is the form used internally by the CMS
@@ -58,4 +66,6 @@ export interface EntityFormProps<M extends Record<string, any>> {
  * @constructor
  * @category Components
  */
-export declare const EntityForm: <M extends Record<string, any>>({ status, path, collection: inputCollection, entity, onEntitySave, onDiscard, onModified, onValuesChanged }: EntityFormProps<M>) => import("@emotion/react/jsx-runtime").JSX.Element;
+export declare const EntityForm: typeof EntityFormInternal;
+declare function EntityFormInternal<M extends Record<string, any>>({ status, path, collection: inputCollection, entity, onEntitySave, onDiscard, onModified, onValuesChanged, onIdChange, onFormContextChange, hideId }: EntityFormProps<M>): import("@emotion/react/jsx-runtime").JSX.Element;
+export {};

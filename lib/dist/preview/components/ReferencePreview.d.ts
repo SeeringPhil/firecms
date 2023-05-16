@@ -8,6 +8,7 @@ export type ReferencePreviewProps = {
     previewProperties?: string[];
     onClick?: () => void;
     onHover?: boolean;
+    allowEntityNavigation?: boolean;
 };
 /**
  * @category Preview components

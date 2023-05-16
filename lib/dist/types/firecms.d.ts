@@ -14,6 +14,13 @@ import { UserConfigurationPersistence } from "./local_config_persistence";
 import { FireCMSPlugin } from "./plugins";
 import { CMSAnalyticsEvent } from "./analytics";
 /**
+ * Use this callback to build entity collections dynamically.
+ * You can use the user to decide which collections to show.
+ * You can also use the data source to fetch additional data to build the
+ * collections.
+ * Note: you can use any type of synchronous or asynchronous code here,
+ * including fetching data from external sources, like using the Firestore
+ * APIs directly, or a REST API.
  * @category Models
  */
 export type EntityCollectionsBuilder = (params: {
@@ -22,6 +29,12 @@ export type EntityCollectionsBuilder = (params: {
     dataSource: DataSource;
 }) => EntityCollection[] | Promise<EntityCollection[]>;
 /**
+ * Use this callback to build custom views dynamically.
+ * You can use the user to decide which views to show.
+ * You can also use the data source to fetch additional data to build the
+ * views. Note: you can use any type of synchronous or asynchronous code here,
+ * including fetching data from external sources, like using the Firestore
+ * APIs directly, or a REST API.
  * @category Models
  */
 export type CMSViewsBuilder = (params: {

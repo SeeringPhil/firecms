@@ -1,5 +1,6 @@
 import React from "react";
 import { DrawerProps } from "./Drawer";
+import { FireCMSAppBarProps } from "./components";
 export declare const DRAWER_WIDTH = 280;
 /**
  * @category Core
@@ -36,6 +37,15 @@ export interface ScaffoldProps<ExtraDrawerProps = {}> {
      * Additional props passed to the custom Drawer
      */
     drawerProps?: ExtraDrawerProps;
+    /**
+     * Open the drawer on hover
+     */
+    autoOpenDrawer?: boolean;
+    /**
+     * A component that gets rendered on the upper side of the main toolbar.
+     * `toolbarExtraWidget` has no effect if this is set.
+     */
+    FireCMSAppBarComponent?: React.ComponentType<FireCMSAppBarProps>;
 }
 /**
  * This view acts as a scaffold for FireCMS.

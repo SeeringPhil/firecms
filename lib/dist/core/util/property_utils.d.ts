@@ -13,3 +13,4 @@ export declare function getColorForProperty(property: PropertyOrBuilder): string
  */
 export declare function getPropertyInPath<M extends Record<string, any>>(properties: PropertiesOrBuilders<M>, path: string): PropertyOrBuilder<any, M> | undefined;
 export declare function getResolvedPropertyInPath(properties: Record<string, ResolvedProperty>, path: string): ResolvedProperty | undefined;
+export declare function getBracketNotation(path: string): string;

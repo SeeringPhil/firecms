@@ -1,4 +1,5 @@
-/// <reference types="react" />
+import React from "react";
+export declare const searchIndex: any;
 /**
  * Default entry view for the CMS. This component renders navigation cards
  * for each collection defined in the navigation.

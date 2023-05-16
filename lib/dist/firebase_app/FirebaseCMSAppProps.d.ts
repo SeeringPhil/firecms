@@ -1,6 +1,6 @@
 import React from "react";
 import { User as FirebaseUser } from "firebase/auth";
-import { CMSAnalyticsEvent, CMSView, CMSViewsBuilder, CollectionOverrideHandler, EntityCollection, EntityCollectionsBuilder, FieldConfig, Locale } from "../types";
+import { CMSAnalyticsEvent, CMSView, CMSViewsBuilder, CollectionOverrideHandler, EntityCollection, EntityCollectionsBuilder, FieldConfig, FireCMSPlugin, Locale, AppCheckOptions } from "../types";
 import { FirestoreTextSearchController } from "./types/text_search";
 import { Authenticator, FirebaseSignInOption, FirebaseSignInProvider } from "./types/auth";
 import { FirebaseLoginViewProps } from "./components/FirebaseLoginView";
@@ -74,6 +74,10 @@ export type FirebaseCMSAppProps = {
      */
     onFirebaseInit?: (config: object) => void;
     /**
+     * Use this to enable Firebase App Check
+     */
+    appCheckOptions?: AppCheckOptions;
+    /**
      * Primary color of the theme of the CMS
      */
     primaryColor?: string;
@@ -139,4 +143,24 @@ export type FirebaseCMSAppProps = {
      * Callback used to get analytics events from the CMS
      */
     onAnalyticsEvent?: (event: CMSAnalyticsEvent, data?: object) => void;
+    /**
+     * Use plugins to modify the behaviour of the CMS.
+     * Currently, in ALPHA, and likely subject to change.
+     */
+    plugins?: FireCMSPlugin[];
+    /**
+     * Open the drawer on hover. Defaults to `false`
+     */
+    autoOpenDrawer?: boolean;
+    /**
+     * Maximum number of snackbar messages that can be displayed at the same time.
+     * Defaults to 3
+     * @see https://mui.com/material-ui/api/snackbar/
+     * */
+    snackbarMaxSnack?: number;
+    /**
+     * Duration of the snackbar auto hide. Defaults to 6000
+     *  @see https://mui.com/material-ui/api/snackbar/
+     * */
+    snackbarAutoHideDuration?: number;
 };

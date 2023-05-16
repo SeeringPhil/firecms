@@ -1,3 +1,4 @@
+/// <reference types="react" />
 /**
  * Possible snackbar types
  * @category Hooks and utilities
@@ -18,7 +19,7 @@ export interface SnackbarController {
      */
     open: (props: {
         type: SnackbarMessageType;
-        message: string;
+        message: React.ReactNode;
     }) => void;
 }
 /**
@@ -33,7 +34,7 @@ export interface SnackbarController {
 export declare const useSnackbarController: () => {
     open: (props: {
         type: SnackbarMessageType;
-        message: string;
+        message: React.ReactNode;
     }) => void;
     close: (key?: import("notistack").SnackbarKey | undefined) => void;
 };

@@ -7,5 +7,5 @@ type DateTimeFieldProps = FieldProps<Date>;
  * and tables to the specified properties.
  * @category Form fields
  */
-export declare function DateTimeFieldBinding({ propertyKey, value, setValue, autoFocus, error, showError, disabled, touched, property, includeDescription, shouldAlwaysRerender }: DateTimeFieldProps): import("@emotion/react/jsx-runtime").JSX.Element;
+export declare function DateTimeFieldBinding({ propertyKey, value, setValue, autoFocus, error, showError, disabled, touched, property, includeDescription }: DateTimeFieldProps): import("@emotion/react/jsx-runtime").JSX.Element;
 export {};

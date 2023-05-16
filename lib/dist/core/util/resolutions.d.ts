@@ -6,7 +6,7 @@ export declare const resolveCollection: <M extends Record<string, any>>({ collec
     values?: Partial<M> | undefined;
     previousValues?: Partial<M> | undefined;
     userConfigPersistence?: UserConfigurationPersistence | undefined;
-    fields?: Record<string, FieldConfig<any>> | undefined;
+    fields?: Record<string, FieldConfig> | undefined;
 }) => ResolvedEntityCollection<M>;
 /**
  * Resolve property builders, enums and arrays.
@@ -15,6 +15,7 @@ export declare const resolveCollection: <M extends Record<string, any>>({ collec
  * @param values
  */
 export declare function resolveProperty<T extends CMSType = CMSType, M extends Record<string, any> = any>({ propertyOrBuilder, propertyValue, fromBuilder, ...props }: {
+    propertyKey?: string;
     propertyOrBuilder: PropertyOrBuilder<T, M> | ResolvedProperty<T>;
     propertyValue?: unknown;
     values?: Partial<M>;
@@ -25,7 +26,8 @@ export declare function resolveProperty<T extends CMSType = CMSType, M extends R
     fromBuilder?: boolean;
     fields?: Record<string, FieldConfig<any>>;
 }): ResolvedProperty<T> | null;
-export declare function resolveArrayProperty<T extends any[], M>({ property, propertyValue, ...props }: {
+export declare function resolveArrayProperty<T extends any[], M>({ propertyKey, property, propertyValue, ...props }: {
+    propertyKey?: string;
     property: ArrayProperty<T> | ResolvedArrayProperty<T>;
     propertyValue: any;
     values?: Partial<M>;

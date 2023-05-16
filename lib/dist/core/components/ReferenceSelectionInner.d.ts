@@ -1,8 +1,9 @@
+import React from "react";
 import { Entity, EntityCollection, FilterValues } from "../../types";
 /**
  * @category Components
  */
-export interface ReferenceDialogProps<M extends Record<string, any>> {
+export interface ReferenceSelectionInnerProps<M extends Record<string, any>> {
     /**
      * Allow multiple selection of values
      */
@@ -37,18 +38,21 @@ export interface ReferenceDialogProps<M extends Record<string, any>> {
         */
     onMultipleEntitiesSelected?(entities: Entity<any>[]): void;
     /**
-     * If the dialog currently open, close it
-     * @callback
-        */
-    onClose?(): void;
-    /**
      * Allow selection of entities that pass the given filter only.
      */
     forceFilter?: FilterValues<string>;
+    /**
+     * Use this description to indicate the user what to do in this dialog.
+     */
+    description?: React.ReactNode;
+    /**
+     * Maximum number of entities that can be selected.
+     */
+    maxSelection?: number;
 }
 /**
  * This component allows to select entities from a given collection.
  * You probably want to open this dialog as a side view using {@link useReferenceDialog}
  * @category Components
  */
-export declare function ReferenceSelectionView<M extends Record<string, any>>({ onSingleEntitySelected, onMultipleEntitiesSelected, onClose, multiselect, collection, path: pathInput, selectedEntityIds, forceFilter }: ReferenceDialogProps<M>): import("@emotion/react/jsx-runtime").JSX.Element;
+export declare function ReferenceSelectionInner<M extends Record<string, any>>({ onSingleEntitySelected, onMultipleEntitiesSelected, multiselect, collection, path: pathInput, selectedEntityIds, description, forceFilter, maxSelection }: ReferenceSelectionInnerProps<M>): import("@emotion/react/jsx-runtime").JSX.Element;

@@ -15,7 +15,7 @@ import { CollectionSize, Entity } from "../../../../types";
  *
  * @category Collection components
  */
-export declare function EntityCollectionRowActions<M extends Record<string, any>>({ entity, width, frozen, isSelected, selectionEnabled, size, toggleEntitySelection, onCopyClicked, onEditClicked, onDeleteClicked }: {
+export declare function EntityCollectionRowActions<M extends Record<string, any>>({ entity, width, frozen, isSelected, selectionEnabled, size, toggleEntitySelection, onCopyClicked, onEditClicked, onDeleteClicked, hideId }: {
     entity: Entity<M>;
     width: number;
     frozen?: boolean;
@@ -26,4 +26,5 @@ export declare function EntityCollectionRowActions<M extends Record<string, any>
     onEditClicked?: (selectedEntity: Entity<M>) => void;
     onCopyClicked?: (selectedEntity: Entity<M>) => void;
     onDeleteClicked?: (selectedEntity: Entity<M>) => void;
+    hideId?: boolean;
 }): import("@emotion/react/jsx-runtime").JSX.Element;

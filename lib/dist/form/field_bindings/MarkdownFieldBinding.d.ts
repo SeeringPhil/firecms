@@ -6,4 +6,4 @@ import { FieldProps } from "../../types";
  * and tables to the specified properties.
  * @category Form fields
  */
-export declare function MarkdownFieldBinding({ propertyKey, value, setValue, error, showError, disabled, autoFocus, touched, property, tableMode, includeDescription, context, shouldAlwaysRerender }: FieldProps<string>): import("@emotion/react/jsx-runtime").JSX.Element;
+export declare function MarkdownFieldBinding({ propertyKey, value, setValue, error, showError, disabled, autoFocus, touched, property, tableMode, includeDescription, context }: FieldProps<string>): import("@emotion/react/jsx-runtime").JSX.Element;

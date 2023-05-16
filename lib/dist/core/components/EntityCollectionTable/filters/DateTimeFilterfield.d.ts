@@ -1,4 +1,4 @@
-import { TableWhereFilterOp } from "../VirtualTableProps";
+import { TableWhereFilterOp } from "../../Table";
 interface DateTimeFilterFieldProps {
     name: string;
     mode?: "date" | "date_time";

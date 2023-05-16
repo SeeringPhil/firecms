@@ -1,4 +1,4 @@
-import { ReferenceDialogProps } from "../core";
+import { ReferenceSelectionInnerProps } from "../core";
 /**
  * This hook is used to open a side dialog that allows the selection
  * of entities under a given path.
@@ -9,8 +9,9 @@ import { ReferenceDialogProps } from "../core";
  * This is the same hook used internally when a reference property is defined.
  * @category Hooks and utilities
  */
-export declare function useReferenceDialog<M extends Record<string, any>>(referenceDialogProps: Omit<ReferenceDialogProps<M>, "path"> & {
+export declare function useReferenceDialog<M extends Record<string, any>>(referenceDialogProps: Omit<ReferenceSelectionInnerProps<M>, "path"> & {
     path?: string | false;
+    onClose?: () => void;
 }): {
     open: () => void;
     close: () => void;

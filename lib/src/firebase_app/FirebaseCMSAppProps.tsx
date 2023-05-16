@@ -198,4 +198,17 @@ export type FirebaseCMSAppProps = {
      */
     autoOpenDrawer?: boolean;
 
+    /**
+     * Maximum number of snackbar messages that can be displayed at the same time.
+     * Defaults to 3
+     * @see https://mui.com/material-ui/api/snackbar/
+     * */
+    snackbarMaxSnack?: number;
+
+    /**
+     * Duration of the snackbar auto hide. Defaults to 6000
+     *  @see https://mui.com/material-ui/api/snackbar/
+     * */
+    snackbarAutoHideDuration?: number;
+
 };

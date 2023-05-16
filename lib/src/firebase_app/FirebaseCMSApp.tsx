@@ -76,7 +76,9 @@ export function FirebaseCMSApp({
                                    onAnalyticsEvent,
                                    fields,
                                    plugins,
-                                   autoOpenDrawer
+                                   autoOpenDrawer,
+                                   snackbarMaxSnack = 3,
+                                   snackbarAutoHideDuration = 5000,
                                }: FirebaseCMSAppProps) {
 
     /**
@@ -175,7 +177,9 @@ export function FirebaseCMSApp({
 
     return (
         <BrowserRouter basename={basePath}>
-            <SnackbarProvider>
+            <SnackbarProvider
+                maxSnack={snackbarMaxSnack}
+                autoHideDuration={snackbarAutoHideDuration}>
                 <ModeControllerProvider
                     value={modeController}>
                     <FireCMS

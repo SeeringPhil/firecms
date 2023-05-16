@@ -126,6 +126,8 @@ function SampleApp() {
     // });
 
     return <FirebaseCMSApp
+        snackbarAutoHideDuration={1000}
+        snackbarMaxSnack={10}
         name={"My Online Shop"}
         // appCheckOptions={appCheckOptions}
         authentication={myAuthenticator}

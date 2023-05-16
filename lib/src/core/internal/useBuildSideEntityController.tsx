@@ -14,10 +14,7 @@ import {
 } from "../util/navigation_from_path";
 import { useLocation } from "react-router-dom";
 import { EntitySidePanel } from "../EntitySidePanel";
-import {
-    getFirstAdditionalView,
-    removeInitialAndTrailingSlashes
-} from "../util";
+import { removeInitialAndTrailingSlashes } from "../util";
 import {
     ADDITIONAL_TAB_WIDTH,
     CONTAINER_FULL_WIDTH,
@@ -26,7 +23,7 @@ import {
 
 const NEW_URL_HASH = "new";
 
-export function getEntityViewWidth(props: EntitySidePanelProps<any, any>, small: boolean): string {
+export function getEntityViewWidth(props: EntitySidePanelProps<any>, small: boolean): string {
     if (small) return CONTAINER_FULL_WIDTH;
     const mainViewSelected = !props.selectedSubPath;
     const resolvedWidth: string | undefined = typeof props.width === "number" ? `${props.width}px` : props.width;
@@ -40,7 +37,6 @@ export const useBuildSideEntityController = (navigation: NavigationContext,
     const initialised = useRef<boolean>(false);
 
     const theme = useTheme();
-    const largeLayout = useMediaQuery(theme.breakpoints.up("lg"));
     const smallLayout: boolean = useMediaQuery(theme.breakpoints.down("sm"));
 
     // only on initialisation, create panels from URL
@@ -65,10 +61,10 @@ export const useBuildSideEntityController = (navigation: NavigationContext,
         if (props.copy && !props.entityId) {
             throw Error("If you want to copy an entity you need to provide an entityId");
         }
-        const firstAdditionalView = largeLayout && props.collection ? getFirstAdditionalView(props.collection) : undefined;
-        sideDialogsController.open(propsToSidePanel({ selectedSubPath: firstAdditionalView?.path, ...props }, navigation, smallLayout));
+        const firstAdditionalView = props.collection ? props.collection.defaultSelectedView : undefined;
+        sideDialogsController.open(propsToSidePanel({ selectedSubPath: firstAdditionalView, ...props }, navigation, smallLayout));
 
-    }, [largeLayout, sideDialogsController, navigation, smallLayout]);
+    }, [sideDialogsController, navigation, smallLayout]);
 
     const replace = useCallback((props: EntitySidePanelProps<any>) => {
 
@@ -139,7 +135,7 @@ function buildSidePanelsFromUrl(path: string, collections: EntityCollection[], n
     return sidePanels;
 }
 
-const propsToSidePanel = (props: EntitySidePanelProps<any, any>, navigation: NavigationContext, smallLayout: boolean): SideDialogPanelProps => {
+const propsToSidePanel = (props: EntitySidePanelProps<any>, navigation: NavigationContext, smallLayout: boolean): SideDialogPanelProps => {
 
     const collectionPath = removeInitialAndTrailingSlashes(props.path);
     const newPath = props.entityId

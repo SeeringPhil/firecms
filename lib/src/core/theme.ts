@@ -1,5 +1,6 @@
 import { pink, red } from "@mui/material/colors";
 import { createTheme, Theme } from "@mui/material";
+import type {} from "@mui/lab/themeAugmentation";
 
 declare module "@mui/material/styles" {
     interface TypographyVariants {
@@ -32,6 +33,10 @@ export const createCMSDefaultTheme = (
     }): Theme => {
 
     const radius = 6;
+
+    const { palette } = createTheme();
+    const { augmentColor } = palette;
+    const createColor = (mainColor: string) => augmentColor({ color: { main: mainColor } });
 
     const original = createTheme({
         palette: {
@@ -105,6 +110,13 @@ export const createCMSDefaultTheme = (
                     }
                 }
             },
+            MuiLoadingButton: {
+                styleOverrides: {
+                    root: {
+                        borderRadius: radius
+                    }
+                }
+            },
             MuiTableRow: {
                 styleOverrides: {
                     root: {
@@ -144,10 +156,17 @@ export const createCMSDefaultTheme = (
             MuiDialog: {
                 styleOverrides: {
                     paper: {
-                        borderRadius: radius
+                        backgroundImage: "inherit",
                     }
                 }
             },
+            // MuiPaper: {
+            //     styleOverrides: {
+            //         outlined: {
+            //             border: "none",
+            //         }
+            //     }
+            // },
             MuiCardActionArea: {
                 styleOverrides: {
                     root: {
@@ -159,10 +178,13 @@ export const createCMSDefaultTheme = (
     });
 
     return {
-        ...original
-        // shadows: original.shadows.map((value, index) => {
-        //     if (index == 1) return "0 1px 1px 0 rgb(0 0 0 / 16%)";
-        //     else return value;
-        // })
+        ...original,
+        // @ts-ignore
+        shadows: original.shadows.map((shadow, index) => {
+            if (index === 3) {
+                return "0px 0px 0px 0px rgba(0,0,0,0.18), 0px 0px 10px 0px rgba(0,0,0,0.12), 0px 0px 14px 2px rgba(0,0,0,0.10)"
+            }
+            return shadow;
+        })
     };
 };

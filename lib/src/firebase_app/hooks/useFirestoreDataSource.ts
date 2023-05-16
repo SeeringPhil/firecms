@@ -41,6 +41,7 @@ import {
     orderBy as orderByClause,
     Query,
     query,
+    QueryConstraint,
     serverTimestamp,
     setDoc,
     startAfter as startAfterClause,
@@ -100,7 +101,7 @@ export function useFirestoreDataSource({
         const firestore = getFirestore(firebaseApp);
         const collectionReference: Query = collectionClause(firestore, path);
 
-        const queryParams = [];
+        const queryParams: QueryConstraint[] = [];
         if (filter) {
             Object.entries(filter)
                 .filter(([_, entry]) => !!entry)
@@ -108,14 +109,6 @@ export function useFirestoreDataSource({
                     const [op, value] = filterParameter as [WhereFilterOp, any];
                     queryParams.push(whereClause(key, op, cmsToFirestoreModel(value, firestore)));
                 });
-        }
-
-        if (filter && orderBy && order) {
-            Object.entries(filter).forEach(([key, value]) => {
-                if (key !== orderBy) {
-                    queryParams.push(orderByClause(key, "asc"));
-                }
-            });
         }
 
         if (orderBy && order) {
@@ -260,7 +253,14 @@ export function useFirestoreDataSource({
             }: ListenCollectionProps<M>
         ): () => void => {
 
-            console.debug("Listening collection", path, limit, filter, startAfter, orderBy, order);
+            console.debug("Listening collection", {
+                path,
+                limit,
+                filter,
+                startAfter,
+                orderBy,
+                order
+            });
 
             const query = buildQuery(path, filter, orderBy, order, startAfter, limit);
 
@@ -489,12 +489,13 @@ export function useFirestoreDataSource({
  * @param data
  * @category Firestore
  */
+export function firestoreToCMSModel(data: any): any
 export function firestoreToCMSModel(data: any): any {
-    if (data === null) return data;
+    if (data === null || data === undefined) return null;
     if (serverTimestamp().isEqual(data)) {
         return null;
     }
-    if (data instanceof Timestamp || typeof data.toDate === "function") {
+    if (data instanceof Timestamp || (typeof data.toDate === "function" && data.toDate() instanceof Date)) {
         return data.toDate();
     }
     if (data instanceof Date) {
@@ -510,7 +511,7 @@ export function firestoreToCMSModel(data: any): any {
         return data.map(firestoreToCMSModel);
     }
     if (typeof data === "object") {
-        const result = {}
+        const result: Record<string, any> = {};
         for (const key of Object.keys(data)) {
             result[key] = firestoreToCMSModel(data[key]);
         }
@@ -518,7 +519,6 @@ export function firestoreToCMSModel(data: any): any {
     }
     return data;
 }
-
 export function cmsToFirestoreModel(data: any, firestore: Firestore): any {
     if (Array.isArray(data)) {
         return data.map(v => cmsToFirestoreModel(v, firestore));

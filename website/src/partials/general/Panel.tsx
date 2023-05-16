@@ -4,12 +4,12 @@ import { ContainerMixin } from "../utils";
 export function Panel({
                           children,
                           color = "gray",
-                          centered = true,
+                          centered = false,
                           includeMargin = false,
                           contained = false
                       }: {
     children: React.ReactNode,
-    color: "gray" | "primary" | "secondary",
+    color?: "gray" | "primary" | "secondary",
     centered?: boolean,
     includeMargin?: boolean,
     contained?: boolean
@@ -22,10 +22,11 @@ export function Panel({
     return (
         <section
             className={"max-w-full relative flex flex-col items " + colorClass
-                + (includeMargin ? " mt-16" : "")}>
-            <div className={ContainerMixin
-                + (contained ? " my-16 max-w-3xl" : " my-12")}>
+                + (includeMargin ? " my-16" : "")}>
+            <div className={(contained ? " my-16 max-w-3xl" : " my-12")}>
+                <div className={ContainerMixin + (centered ? " flex flex-col items-center" : "")}>
                 {children}
+                </div>
             </div>
         </section>
     );

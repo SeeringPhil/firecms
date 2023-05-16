@@ -18,10 +18,10 @@ function HeroButtons() {
         </defs>
     </svg>;
 
-    return <>
+    return <div className="mt-8 mb-8 flex justify-center flex-col md:flex-row">
 
         <a
-            className={"btn shadow-none mb-4 sm:mb-0 font-bold py-4 text-white font-bold dark:hover:bg-gray-900 hover:bg-gray-200 uppercase border border-solid w-full sm:w-auto rounded"}
+            className={"btn shadow-none mb-4 sm:mb-0  py-4 text-white  dark:hover:bg-gray-900 hover:bg-gray-200 uppercase border border-solid w-full sm:w-auto rounded"}
             href={"https://discord.gg/fxy7xsQm3m"}
         >
             {discordIcon}
@@ -35,14 +35,14 @@ function HeroButtons() {
             Demo
         </a>
         <a
-            className={CTAButtonMixin + "  sm:mb-0 w-full sm:w-auto rounded sm:ml-4 ml-2"}
+            className={CTAButtonMixin + "  sm:mb-0 w-full md:w-auto rounded md:ml-4 ml-2"}
             // href={"https://app.firecms.co"}
             href={useBaseUrl("docs/")}
         >
             Get started
             <CTACaret/>
         </a>
-    </>;
+    </div>;
 }
 
 export default HeroButtons;

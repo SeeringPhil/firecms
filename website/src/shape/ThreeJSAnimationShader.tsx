@@ -10,10 +10,10 @@ import { BufferGeometryUtils } from "./BufferGeometryUtils";
 
 // const CAMERA_FACTOR = 40;
 const CAMERA_FACTOR = 180;
-const TIME_DILATION = 1 / 3;
+const TIME_DILATION = 1 / 4;
 const BRIGHT = true;
 const DISPLACEMENT_RADIO = 1.0 / 9.0;
-const DISPLACEMENT_AREA = 1.0;
+const DISPLACEMENT_AREA = 1.1;
 const SPHERE_RADIUS = 18;
 
 type SceneState = {
@@ -26,6 +26,11 @@ type SceneState = {
 
 type AnimationProps = { darkMode: boolean, opacity: number };
 
+// const red = new THREE.Color("#ff586b");
+// const magenta = new THREE.Color("#ff56a3");
+// const cyan = new THREE.Color("#3cc7c9");
+// const blue = new THREE.Color("#4479ff");
+// const yellow = new THREE.Color("#ffc857");
 const red = new THREE.Color(1.0, .2, .2);
 const magenta = new THREE.Color(0xFF5B79);
 const cyan = new THREE.Color(.53, .96, 1.);
@@ -71,25 +76,25 @@ export default function ThreeJSAnimationShader({
             const x = dodecahedron.attributes.position.array[i * 3];
             const y = dodecahedron.attributes.position.array[i * 3 + 1];
             const z = dodecahedron.attributes.position.array[i * 3 + 2];
-                const pos = [
-                    x,
-                    y,
-                    z
-                ];
-                const norm = [
-                    dodecahedron.attributes.normal.array[i * 3],
-                    dodecahedron.attributes.normal.array[i * 3 + 1],
-                    dodecahedron.attributes.normal.array[i * 3 + 2]
-                ];
-                const uv = [
-                    dodecahedron.attributes.uv.array[i * 2],
-                    dodecahedron.attributes.uv.array[i * 2 + 1]
-                ];
-                vertices.push({
-                    pos,
-                    norm,
-                    uv
-                });
+            const pos = [
+                x,
+                y,
+                z
+            ];
+            const norm = [
+                dodecahedron.attributes.normal.array[i * 3],
+                dodecahedron.attributes.normal.array[i * 3 + 1],
+                dodecahedron.attributes.normal.array[i * 3 + 2]
+            ];
+            const uv = [
+                dodecahedron.attributes.uv.array[i * 2],
+                dodecahedron.attributes.uv.array[i * 2 + 1]
+            ];
+            vertices.push({
+                pos,
+                norm,
+                uv
+            });
         }
 
         const positions: number[] = [];
@@ -161,7 +166,7 @@ export default function ThreeJSAnimationShader({
 
         const material = buildMaterial(width, height, SPHERE_RADIUS, DISPLACEMENT_RADIO, DISPLACEMENT_AREA, 6.0);
 
-        const geometry = buildNightGeometry(SPHERE_RADIUS, 22);
+        const geometry = buildNightGeometry(SPHERE_RADIUS, 20);
         const mesh = new THREE.Mesh(geometry, material);
         mesh.rotation.x = .2;
         mesh.initialPositionY = 17;
@@ -221,7 +226,7 @@ export default function ThreeJSAnimationShader({
                 mesh.material.uniforms.u_opacity.value = opacity;
                 mesh.material.uniforms.u_dark_mode.value = darkMode ? 1.0 : 0.0;
                 mesh.position.y = mesh.initialPositionY + scrollRef.current / 100;
-                mesh.rotation.x = scrollRef.current / 1000;
+                mesh.rotation.x = -scrollRef.current / 1000;
             });
 
             composer.render();
@@ -492,63 +497,63 @@ function buildVertexShader() {
                         -0.09991, -0.33609, 0.43600,
                         0.615, -0.5586, -0.05639);
 
-
     vec3 getColor(){
-
-        if (u_dark_mode == 1.0){
-            return vec3(0.0, 0.0, 0.0);
-        }
-
-        vec3 st = v_position / u_sphere_radius;
-
+    
+        // if (u_dark_mode == 1.0){
+        //     return vec3(0.0, 0.0, 0.0);
+        // }
+    
+        // vec3 st = v_position / u_sphere_radius + vNormal * .1;
+        vec3 st =  vNormal * 1.1 + v_position / u_sphere_radius / 10.0;
+    
         vec3 color;
-
+    
         color = u_colors[0];
-        
+    
         const float minNoise = .0;
         const float maxNoise = .75;
-        
-        vec2 color_pressure = vec2(1.3, 1.3);
     
         for (int i = 1; i < u_colors_count; i++) {
-        
+    
             float noiseFlow = (1. + float(i)) / 30.;
             float noiseSpeed = (1. + float(i)) * 0.15;
             float noiseSeed = 13. + float(i) * 7.;
-                
+    
             float noise = snoise(
                 vec3(
                     st.x * 1.5 + noiseFlow,
-                    st.y * 1.5 + noiseFlow,
+                    st.y * 2.5 + noiseFlow,
                     u_time * noiseSpeed 
                 ) + noiseSeed
             );
-            
+    
             noise = clamp(minNoise, maxNoise + float(i) * 0.05, noise);
             vec3 nextColor = u_colors[i];
-            color = mix(color, nextColor, smoothstep(0.0, .9, noise));
+            color = mix(color, nextColor, smoothstep(0.0, 1.0, noise));
         }
     
         return color;
     }
 
     void main() {
-
+    
         vUv = uv;
-
-        float s = 2.45;
-        float r = u_time * 0.25;
-
+    
+        float s = 2.50;
+        float r = u_time * 0.35;
+    
         vNormal = normal;
         v_position = position;
         v_displacement_amount = cnoise(s * normal * u_displacement_area + r) ;
-
+    
         vec3 newPosition = position * (v_displacement_amount * u_displacement_ratio + 1.0) ;
-
+    
         v_color = getColor();
-
+    
         gl_Position = projectionMatrix * modelViewMatrix * vec4( newPosition, 1.0 );
     }
+
+
 `;
 }
 
@@ -572,15 +577,40 @@ vec3 czm_saturation(vec3 rgb, float adjustment) {
     return mix(intensity, rgb, adjustment);
 }
 
+float Sigmoid (float x) {
+
+//return 1.0 / (1.0 + (exp(-(x * 14.0 - 7.0))));
+    return 1.0 / (1.0 + (exp(-(x - 0.5) * 14.0))); 
+}
+
 void main(){
     vec3 color = v_color;
-    color.rgb +=  v_displacement_amount * 0.2;
+    color.rgb += v_displacement_amount * 0.3;
+    color = czm_saturation(color, 1.1);
+    
     if(u_dark_mode == 1.0){
-        color.rg -=  (1.0 - v_position.z / u_sphere_radius) * .2;
+        color.g = color.g * 0.15;
+        color.r = color.r * 0.35;
+        color.b = color.b * 0.45;
+        if(v_position.z < 0.0){
+            color.rg /=  (u_sphere_radius - v_position.z) / u_sphere_radius * 1.1;
+        }
     } else {
+        // color.g = color.g * .99;
+        // color.r = color.r * .90;
+        // color.b = color.b * 1.1;
+        
+        if(v_position.z < 0.0){
+            // color.rg *=  (u_sphere_radius - v_position.z) / u_sphere_radius * 1.4;
+        }
     }
-        color = czm_saturation(color, 1.1);
-    gl_FragColor = vec4(color,.9);
+    
+    if (v_position.z < 0.0){
+        gl_FragColor = vec4(color, Sigmoid((u_sphere_radius - v_position.z) / u_sphere_radius ) * .65);
+    } else {
+        gl_FragColor = vec4(color,.8);
+    }
+    // gl_FragColor = vec4(color,(u_sphere_radius - v_position.z) / u_sphere_radius * 1.0);
 }
 `;
 }

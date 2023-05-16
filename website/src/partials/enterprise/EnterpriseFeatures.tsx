@@ -1,7 +1,6 @@
 import React from "react";
 import { ContainerMixin, ContainerSmallMixin } from "../utils";
 import { TwoColumns } from "../general/TwoColumns";
-import { lightningIcon } from "../icons";
 import { Panel } from "../general/Panel";
 import AutoModeIcon from "@site/static/img/icons/auto_mode.svg";
 import SettingsIcon from "@site/static/img/icons/settings.svg";
@@ -22,33 +21,36 @@ export function EnterpriseFeatures() {
                             className="flex items-center justify-center text-white w-10 h-10 bg-gray-800 rounded-full shadow flex-shrink-0 mr-3">
                             <AutoModeIcon width={"20px"} height={"20px"}/>
                         </div>
-                        <h2 className={"h2 m-0"}>Why FireCMS?</h2>
+                        <h2 className={"h2 m-0"}>Why Choose FireCMS?</h2>
 
                     </div>
 
 
-                    <p className={"text-xl "}>
-                        Every company needs to manage content in different ways.
-                        We have built FireCMS to be flexible and customizable.
+                    <p className={"text-2xl "}>
+                        Every organization has unique content management
+                        requirements. We've designed FireCMS with flexibility
+                        and customization in mind to cater to these diverse
+                        needs.
                     </p>
 
-                    <p>
-                        Firestore provides a degree of scalability that is hard
-                        to find in other platforms. It is a great fit for
-                        companies
-                        that are looking to build a product that can scale to
-                        millions of users. Without the need to worry about the
-                        infrastructure.
+                    <p className={"text-2xl "}>
+                        Firebase offers exceptional scalability, making it an
+                        ideal choice for companies aiming to build products that
+                        can accommodate millions of users. With Firebase/Firestore, you
+                        can focus on your product without concerns about
+                        infrastructure limitations.
                     </p>
                 </>}
                 right={<>
-                    <div className={"my-4 text-2xl"}>
+                    <div className={"m-4 text-3xl"}>
                         <div className={"flex items-center gap-4"}>
                             <CheckCircleIcon/>SSO integration
                         </div>
                         <div className={"flex items-center gap-4"}>
-                            <CheckCircleIcon/>Advanced data filtering and text
-                            search
+                            <CheckCircleIcon/>Advanced data filtering
+                        </div>
+                        <div className={"flex items-center gap-4"}>
+                            <CheckCircleIcon/>Text search
                         </div>
                         <div className={"flex items-center gap-4"}>
                             <CheckCircleIcon/>Support SLA
@@ -56,15 +58,13 @@ export function EnterpriseFeatures() {
                         <div className={"flex items-center gap-4"}>
                             <CheckCircleIcon/>Custom integrations
                         </div>
-                        <div className={"flex items-center gap-4"}>
-                            <CheckCircleIcon/>Dedicated support
-                        </div>
 
                     </div>
                 </>}/>
 
             <Panel color={"gray"} includeMargin={true}>
-                <div className={"text-xl"}>
+                <div
+                    className={"max-w-7xl text-2xl md:text-5xl font-bold tracking-tight"}>
                     <p>
                         FireCMS was developed in conjunction with <strong>different
                         companies</strong>, out of the need to have a CMS that
@@ -87,13 +87,10 @@ export function EnterpriseFeatures() {
 
                 </div>
 
-                <p className={"text-xl "}>
+                <p className={"text-2xl "}>
                     FireCMS can be extended to
                     fit your needs. We can help you build a custom
                     admin panel that integrates with your infrastructure.
-                </p>
-
-                <p className={"text-xl "}>
                     We believe in <strong>sensible
                     defaults</strong>, but we also
                     believe that you should be able to <strong>customize
@@ -156,7 +153,7 @@ export function EnterpriseFeatures() {
             {/*<section className={ContainerMixin + " my-8"}>*/}
 
             {/*    <h2 className={"h2"}>Perfect for apps</h2>*/}
-            {/*    <p className={"text-xl "}>*/}
+            {/*    <p className={"text-2xl "}>*/}
             {/*        Firebase is an excellent fit for apps. It provides a great*/}
             {/*        developer experience and it is easy to integrate with*/}
             {/*        different platforms.*/}

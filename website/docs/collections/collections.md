@@ -4,6 +4,11 @@ title: Collections
 sidebar_label: Collections
 ---
 
+:::tip
+You can customize your collections based on the **logged-in user**, by defining 
+them using a callback, as described in [Navigation](../navigation).
+:::
+
 In FireCMS, **collections** represent groups of entities.
 
 You can find collections at the **top level** of the navigation tree (the
@@ -15,7 +20,7 @@ to generate the fields in the spreadsheet like collection tables, and the fields
 in the generated forms.
 
 :::note
-FireCMS provides around 15 different fields (such as text fields,
+FireCMS provides around 20 different fields (such as text fields,
 selects, and complex ones like reference or sortable array fields). If your use
 case is not covered by one of the provided fields, you can create your own
 [custom field](../properties/custom_fields.md).

@@ -7,7 +7,11 @@ import {
     Paper,
     Select
 } from "@mui/material";
-import { FastField, FieldProps as FormikFieldProps } from "formik";
+import {
+    FastField,
+    FieldProps as FormikFieldProps,
+    useFormikContext
+} from "formik";
 
 import { ArrayContainer, FieldDescription, LabelWithIcon } from "../components";
 import { useClearRestoreValue } from "../../hooks";
@@ -17,9 +21,9 @@ import {
     EnumValueConfig,
     FieldProps,
     FormContext,
-    ResolvedProperty
+    PropertyOrBuilder
 } from "../../types";
-import { ExpandablePanel } from "../../core";
+import { ExpandablePanel, getIconForProperty } from "../../core";
 import {
     DEFAULT_ONE_OF_TYPE,
     DEFAULT_ONE_OF_VALUE
@@ -34,20 +38,19 @@ import {
  * @category Form fields
  */
 export function BlockFieldBinding<T extends Array<any>>({
-                                                          propertyKey,
-                                                          value,
-                                                          error,
-                                                          showError,
-                                                          isSubmitting,
-                                                          setValue,
-                                                          tableMode,
-                                                          property,
-                                                          includeDescription,
-                                                          underlyingValueHasChanged,
-                                                          context,
-                                                          disabled,
-                                                          shouldAlwaysRerender
-                                                      }: FieldProps<T>) {
+                                                            propertyKey,
+                                                            value,
+                                                            error,
+                                                            showError,
+                                                            isSubmitting,
+                                                            setValue,
+                                                            tableMode,
+                                                            property,
+                                                            includeDescription,
+                                                            underlyingValueHasChanged,
+                                                            context,
+                                                            disabled
+                                                        }: FieldProps<T>) {
 
     if (!property.oneOf)
         throw Error("ArrayOneOfField misconfiguration. Property `oneOf` not set");
@@ -62,21 +65,21 @@ export function BlockFieldBinding<T extends Array<any>>({
     const [lastAddedId, setLastAddedId] = useState<number | undefined>();
 
     const buildEntry = useCallback((index: number, internalId: number) => {
-        return <ArrayOneOfEntry
+        return <BlockEntry
             key={`array_one_of_${index}`}
-            name={`${propertyKey}[${index}]`}
+            name={`${propertyKey}.${index}`}
             index={index}
             value={value[index]}
             typeField={property.oneOf!.typeField ?? DEFAULT_ONE_OF_TYPE}
             valueField={property.oneOf!.valueField ?? DEFAULT_ONE_OF_VALUE}
             properties={property.oneOf!.properties}
             autoFocus={internalId === lastAddedId}
-            shouldAlwaysRerender={shouldAlwaysRerender}
             context={context}/>;
     }, [context, lastAddedId, property.oneOf, propertyKey, value]);
 
     const title = (
-        <LabelWithIcon property={property}/>
+        <LabelWithIcon icon={getIconForProperty(property)}
+                       title={property.name}/>
     );
 
     const body = <ArrayContainer value={value}
@@ -85,14 +88,18 @@ export function BlockFieldBinding<T extends Array<any>>({
                                  buildEntry={buildEntry}
                                  onInternalIdAdded={setLastAddedId}
                                  disabled={isSubmitting || Boolean(property.disabled)}
-                                 includeAddButton={!property.disabled}/>;
+                                 includeAddButton={!property.disabled}
+                                 newDefaultEntry={{
+                                     [property.oneOf!.typeField ?? DEFAULT_ONE_OF_TYPE]: Object.keys(property.oneOf.properties)[0]
+                                 }}/>;
     return (
 
         <FormControl fullWidth error={showError}>
 
-            {!tableMode && <ExpandablePanel expanded={expanded} title={title}>
-                {body}
-            </ExpandablePanel>}
+            {!tableMode &&
+                <ExpandablePanel initiallyExpanded={expanded} title={title}>
+                    {body}
+                </ExpandablePanel>}
 
             {tableMode && body}
 
@@ -101,13 +108,13 @@ export function BlockFieldBinding<T extends Array<any>>({
 
             {showError &&
                 typeof error === "string" &&
-                <FormHelperText>{error}</FormHelperText>}
+                <FormHelperText error={true}>{error}</FormHelperText>}
 
         </FormControl>
     );
 }
 
-interface ArrayOneOfEntryProps {
+interface BlockEntryProps {
     name: string;
     index: number;
     value: any;
@@ -127,30 +134,36 @@ interface ArrayOneOfEntryProps {
      * Record of properties, where the key is the `type` and the value
      * is the corresponding property
      */
-    properties: Record<string, ResolvedProperty>;
+    properties: Record<string, PropertyOrBuilder>;
 
     /**
      * Additional values related to the state of the form or the entity
      */
     context: FormContext<any>;
 
-    shouldAlwaysRerender: boolean;
 }
 
-function ArrayOneOfEntry({
-                             name,
-                             index,
-                             value,
-                             typeField,
-                             valueField,
-                             properties,
-                             autoFocus,
-                             shouldAlwaysRerender,
-                             context
-                         }: ArrayOneOfEntryProps) {
+function BlockEntry({
+                        name,
+                        index,
+                        value,
+                        typeField,
+                        valueField,
+                        properties,
+                        autoFocus,
+                        context
+                    }: BlockEntryProps) {
 
     const type = value && value[typeField];
     const [typeInternal, setTypeInternal] = useState<string | undefined>(type ?? undefined);
+
+    const formikContext = useFormikContext();
+
+    useEffect(() => {
+        if (!type) {
+            updateType(Object.keys(properties)[0]);
+        }
+    }, []);
 
     useEffect(() => {
         if (type !== typeInternal) {
@@ -161,10 +174,13 @@ function ArrayOneOfEntry({
     const property = typeInternal ? properties[typeInternal] : undefined;
 
     const enumValuesConfigs: EnumValueConfig[] = Object.entries(properties)
-        .map(([key, property]) => ({ id: key, label: property.name ?? key }));
+        .map(([key, property]) => ({
+            id: key,
+            label: property.name ?? key
+        }));
 
-    const typeFieldName = `${name}[${typeField}]`;
-    const valueFieldName = `${name}[${valueField}]`;
+    const typeFieldName = `${name}.${typeField}`;
+    const valueFieldName = `${name}.${valueField}`;
 
     const fieldProps = property
         ? {
@@ -172,14 +188,22 @@ function ArrayOneOfEntry({
             property,
             context,
             autoFocus,
-            tableMode: false,
-            shouldAlwaysRerender: property.fromBuilder
+            tableMode: false
         }
         : undefined;
+
+    const updateType = useCallback((newType: any) => {
+        setTypeInternal(newType);
+        formikContext.setFieldTouched(typeFieldName);
+        formikContext.setFieldValue(typeFieldName, newType);
+        formikContext.setFieldValue(valueFieldName, null);
+    }, [typeFieldName, valueFieldName]);
+
     return (
         <Paper sx={(theme) => ({
             padding: theme.spacing(1),
-            mb: 1
+            my: 1,
+            py: 2
         })} elevation={0}>
 
             <FastField
@@ -188,7 +212,7 @@ function ArrayOneOfEntry({
             >
                 {(fieldProps: FormikFieldProps) =>
                     (
-                        <FormControl fullWidth>
+                        <FormControl fullWidth size="small">
                             <InputLabel
                                 id={`${name}_${index}_select_label`}>
                                 <span>Type</span>
@@ -200,11 +224,8 @@ function ArrayOneOfEntry({
                                 label={"Type"}
                                 value={fieldProps.field.value !== undefined && fieldProps.field.value !== null ? fieldProps.field.value : ""}
                                 onChange={(evt: any) => {
-                                    const eventValue = evt.target.value;
-                                    fieldProps.form.setFieldTouched(typeFieldName);
-                                    setTypeInternal(eventValue);
-                                    fieldProps.form.setFieldValue(typeFieldName, eventValue);
-                                    fieldProps.form.setFieldValue(valueFieldName, null);
+                                    const newType = evt.target.value;
+                                    updateType(newType);
                                 }}
                                 renderValue={(enumKey: any) =>
                                     <EnumValuesChip

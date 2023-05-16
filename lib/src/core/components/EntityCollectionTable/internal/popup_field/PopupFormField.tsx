@@ -15,6 +15,7 @@ import {
     Entity,
     EntityCollection,
     EntityValues,
+    FireCMSPlugin,
     FormContext,
     PropertyFieldBindingProps,
     ResolvedEntityCollection,
@@ -76,10 +77,13 @@ export function PopupFormFieldInternal<M extends Record<string, any>>({
                                                                       }: PopupFormFieldProps<M>) {
 
     const dataSource = useDataSource();
-    const context = useFireCMSContext();
+    const fireCMSContext = useFireCMSContext();
 
     const [savingError, setSavingError] = React.useState<any>();
-    const [popupLocation, setPopupLocation] = useState<{ x: number, y: number }>();
+    const [popupLocation, setPopupLocation] = useState<{
+        x: number,
+        y: number
+    }>();
     const [internalValue, setInternalValue] = useState<EntityValues<M> | undefined>(entity?.values);
 
     const collection: ResolvedEntityCollection<M> | undefined = inputCollection
@@ -88,21 +92,26 @@ export function PopupFormFieldInternal<M extends Record<string, any>>({
             path,
             values: internalValue,
             entityId: entity?.id,
-            fields: context.fields
+            fields: fireCMSContext.fields
         })
         : undefined;
 
     const windowSize = useWindowSize();
 
     const containerRef = React.useRef<HTMLDivElement>(null);
+    const innerRef = React.useRef<HTMLDivElement>(null);
 
     const initialPositionSet = React.useRef<boolean>(false);
 
     useDraggable({
         containerRef,
+        innerRef,
         x: popupLocation?.x,
         y: popupLocation?.y,
-        onMove: (x, y) => onMove({ x, y })
+        onMove: (x, y) => onMove({
+            x,
+            y
+        })
     });
 
     useEffect(
@@ -111,13 +120,6 @@ export function PopupFormFieldInternal<M extends Record<string, any>>({
         },
         [propertyKey, entity]
     );
-
-    // useEffect(
-    //     () => {
-    //         setInternalValue(entity?.values);
-    //     },
-    //     [entity?.values]
-    // );
 
     const getInitialLocation = useCallback(() => {
         if (!cellRect) throw Error("getInitialLocation error");
@@ -147,7 +149,10 @@ export function PopupFormFieldInternal<M extends Record<string, any>>({
         };
     }, [windowSize]);
 
-    const updatePopupLocation = useCallback((position?: { x: number, y: number }) => {
+    const updatePopupLocation = useCallback((position?: {
+        x: number,
+        y: number
+    }) => {
 
         const draggableBoundingRect = containerRef.current?.getBoundingClientRect();
         if (!cellRect || !draggableBoundingRect) return;
@@ -211,7 +216,7 @@ export function PopupFormFieldInternal<M extends Record<string, any>>({
                 fullPath: path,
                 collection: inputCollection,
                 dataSource,
-                context
+                context: fireCMSContext
             });
         }
         return Promise.resolve();
@@ -264,11 +269,12 @@ export function PopupFormFieldInternal<M extends Record<string, any>>({
 
                     const disabled = isSubmitting;
 
-                    const context: FormContext<M> = {
+                    const formContext: FormContext<M> = {
                         collection,
                         entityId: entity.id,
                         values,
-                        path
+                        path,
+                        setFieldValue
                     };
 
                     const property: ResolvedProperty<any> | undefined = propertyKey && collection.properties[propertyKey];
@@ -280,52 +286,82 @@ export function PopupFormFieldInternal<M extends Record<string, any>>({
                             property,
                             includeDescription: false,
                             underlyingValueHasChanged: false,
-                            context,
+                            context: formContext,
                             tableMode: true,
                             partOfArray: false,
-                            autoFocus: open,
-                            shouldAlwaysRerender: true
+                            autoFocus: open
                         }
                         : undefined;
 
-                    return (
-                        <Box
-                            key={`popup_form_${tableKey}_${entity.id}_${columnIndex}`}
-                            sx={{
-                                width: 520,
-                                maxWidth: "100vw",
-                                maxHeight: "85vh"
-                            }}>
-                            <Form
-                                onSubmit={handleSubmit}
-                                noValidate>
+                    let internalForm = <><Box
+                        key={`popup_form_${tableKey}_${entity.id}_${columnIndex}`}
+                        sx={{
+                            width: 520,
+                            maxWidth: "100vw",
+                            maxHeight: "85vh"
+                        }}>
+                        <Form
+                            onSubmit={handleSubmit}
+                            noValidate>
 
+                            <Box
+                                sx={{
+                                    mb: 1,
+                                    padding: 2,
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    position: "relative"
+                                }}>
                                 <Box
+                                    ref={innerRef}
                                     sx={{
-                                        mb: 1,
-                                        padding: 2,
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        position: "relative"
+                                        cursor: "auto !important"
                                     }}>
                                     {fieldProps &&
                                         <PropertyFieldBinding {...fieldProps}/>}
                                 </Box>
+                            </Box>
 
-                                <CustomDialogActions>
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
-                                        type="submit"
-                                        disabled={disabled}
-                                    >
-                                        Save
-                                    </Button>
-                                </CustomDialogActions>
+                            <CustomDialogActions>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    type="submit"
+                                    disabled={disabled}
+                                >
+                                    Save
+                                </Button>
+                            </CustomDialogActions>
 
-                            </Form>
+                        </Form>
 
-                        </Box>);
+                    </Box></>;
+
+                    const plugins = fireCMSContext.plugins;
+                    if (plugins) {
+                        // const formController: FormContext<M> = {
+                        //     values,
+                        //     setFieldValue
+                        // }
+                        plugins.forEach((plugin: FireCMSPlugin) => {
+                            if (plugin.form?.provider) {
+                                internalForm = (
+                                    <plugin.form.provider.Component
+                                        status={"existing"}
+                                        path={path}
+                                        collection={collection}
+                                        entity={entity}
+                                        context={fireCMSContext}
+                                        currentEntityId={entity.id}
+                                        formContext={formContext}
+                                        {...plugin.form.provider.props}>
+                                        {internalForm}
+                                    </plugin.form.provider.Component>
+                                );
+                            }
+                        });
+                    }
+                    return internalForm;
                 }}
             </Formik>
 

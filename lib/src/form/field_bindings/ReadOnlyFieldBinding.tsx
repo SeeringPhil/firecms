@@ -7,6 +7,7 @@ import { PropertyPreview } from "../../preview";
 import { FieldDescription } from "../index";
 import { LabelWithIcon } from "../components";
 import { ErrorBoundary } from "../../core/components/ErrorBoundary";
+import { getIconForProperty } from "../../core";
 
 /**
  *
@@ -30,8 +31,11 @@ export function ReadOnlyFieldBinding({
                                          context
                                      }: FieldProps<any>) {
 
+    if (!context.entityId)
+        throw new Error("ReadOnlyFieldBinding: Entity id is null");
+
     const entity: Entity<any> = {
-        id: context.entityId,
+        id: context.entityId!,
         values: context.values,
         path: context.path
     };
@@ -41,7 +45,8 @@ export function ReadOnlyFieldBinding({
         <FormControl fullWidth error={showError}>
 
             {!tableMode && <FormHelperText filled>
-                <LabelWithIcon property={property}/>
+                <LabelWithIcon icon={getIconForProperty(property)}
+                               title={property.name}/>
             </FormHelperText>}
 
             <Paper
@@ -67,7 +72,7 @@ export function ReadOnlyFieldBinding({
 
             {showError &&
                 typeof error === "string" &&
-                <FormHelperText>{error}</FormHelperText>}
+                <FormHelperText error={true}>{error}</FormHelperText>}
 
             {includeDescription &&
                 <FieldDescription property={property}/>}

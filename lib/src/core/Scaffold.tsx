@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useCallback, useEffect } from "react";
+import React, { PropsWithChildren, useCallback } from "react";
 import equal from "react-fast-compare"
 
 import {
@@ -13,11 +13,13 @@ import {
     useTheme
 } from "@mui/material";
 import { Drawer as FireCMSDrawer, DrawerProps } from "./Drawer";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useFireCMSContext, useNavigationContext } from "../hooks";
 import {
     CircularProgressCenter,
     ErrorBoundary,
+    FireCMSAppBar,
+    FireCMSAppBarProps,
     FireCMSLogo
 } from "./components";
 import { CSSObject, styled, Theme } from "@mui/material/styles";
@@ -26,7 +28,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import IconButton from "@mui/material/IconButton";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import { FireCMSAppBar } from "./internal/FireCMSAppBar";
+import { useRestoreScroll } from "./internal/useRestoreScroll";
 
 export const DRAWER_WIDTH = 280;
 
@@ -73,6 +75,17 @@ export interface ScaffoldProps<ExtraDrawerProps = {}> {
      */
     drawerProps?: ExtraDrawerProps;
 
+    /**
+     * Open the drawer on hover
+     */
+    autoOpenDrawer?: boolean;
+
+    /**
+     * A component that gets rendered on the upper side of the main toolbar.
+     * `toolbarExtraWidget` has no effect if this is set.
+     */
+    FireCMSAppBarComponent?: React.ComponentType<FireCMSAppBarProps>;
+
 }
 
 /**
@@ -97,49 +110,66 @@ export const Scaffold = React.memo<PropsWithChildren<ScaffoldProps>>(
             drawerUrl,
             drawerUrlLabel,
             toolbarExtraWidget,
-            Drawer
+            Drawer,
+            autoOpenDrawer,
+            FireCMSAppBarComponent = FireCMSAppBar,
         } = props;
 
         const theme = useTheme();
         const largeLayout = useMediaQuery(theme.breakpoints.up("md"));
 
         const navigation = useNavigationContext();
-        const containerRef = useRestoreScroll();
+        const { containerRef } = useRestoreScroll();
 
         const [drawerOpen, setDrawerOpen] = React.useState(false);
+        const [onHover, setOnHover] = React.useState(false);
+
+        const setOnHoverTrue = useCallback(() => setOnHover(true), []);
+        const setOnHoverFalse = useCallback(() => setOnHover(false), []);
 
         const UsedDrawer = Drawer || FireCMSDrawer;
 
         const handleDrawerClose = useCallback(() => {
+            console.log("handleDrawerClose");
             setDrawerOpen(false);
         }, []);
 
+        const computedDrawerOpen: boolean = drawerOpen || Boolean(largeLayout && autoOpenDrawer && onHover);
         return (
-            <Box sx={{
-                display: "flex",
-                height: "100vh",
-                width: "100vw",
-                pt: "env(safe-area-inset-top)",
-                pl: "env(safe-area-inset-left)",
-                pr: "env(safe-area-inset-right)",
-                pb: "env(safe-area-inset-bottom)"
-            }}>
+            <Box
+                sx={{
+                    display: "flex",
+                    height: "100vh",
+                    "@supports (height: 100dvh)": {
+                        height: "100dvh"
+                    },
+                    width: "100vw",
+                    pt: "env(safe-area-inset-top)",
+                    pl: "env(safe-area-inset-left)",
+                    pr: "env(safe-area-inset-right)",
+                    pb: "env(safe-area-inset-bottom)"
+                }}>
 
-                <FireCMSAppBar title={name}
-                               drawerOpen={drawerOpen}
-                               toolbarExtraWidget={toolbarExtraWidget}/>
+                <FireCMSAppBarComponent title={name}
+                                        drawerOpen={computedDrawerOpen}
+                                        toolbarExtraWidget={toolbarExtraWidget}/>
 
                 <StyledDrawer
-                    open={drawerOpen}
+                    onMouseEnter={setOnHoverTrue}
+                    onMouseMove={setOnHoverTrue}
+                    onMouseLeave={setOnHoverFalse}
+                    open={computedDrawerOpen}
                     logo={logo}
                     drawerUrl={drawerUrl}
                     drawerUrlLabel={drawerUrlLabel}
+                    hovered={autoOpenDrawer ? onHover : false}
                     setDrawerOpen={setDrawerOpen}>
                     <nav>
                         {navigation.loading
                             ? <CircularProgressCenter/>
                             : <UsedDrawer
-                                drawerOpen={drawerOpen}
+                                hovered={onHover}
+                                drawerOpen={computedDrawerOpen}
                                 closeDrawer={handleDrawerClose}/>}
                     </nav>
                 </StyledDrawer>
@@ -158,9 +188,10 @@ export const Scaffold = React.memo<PropsWithChildren<ScaffoldProps>>(
                         ref={containerRef}
                         sx={{
                             flexGrow: 1,
-                            m: largeLayout ? 2 : 1,
-                            borderRadius: "12px",
-                            border: `1px solid ${theme.palette.divider}`,
+                            m: largeLayout ? 2 : 0,
+                            mt: largeLayout ? 0 : 1,
+                            borderRadius: largeLayout ? "12px" : undefined,
+                            border: largeLayout ? `1px solid ${theme.palette.divider}` : undefined,
                             height: "100%",
                             overflow: "auto"
                         }}>
@@ -177,42 +208,6 @@ export const Scaffold = React.memo<PropsWithChildren<ScaffoldProps>>(
     equal
 )
 
-function useRestoreScroll() {
-
-    const scrollsMap = React.useRef<Record<string, number>>({});
-
-    const location = useLocation();
-
-    const containerRef = React.createRef<HTMLDivElement>();
-
-    const handleScroll = () => {
-        if (!containerRef.current || !location.key) return;
-        scrollsMap.current[location.key] = containerRef.current.scrollTop;
-    };
-
-    useEffect(() => {
-        const container = containerRef.current;
-        if (!container) return;
-        container.addEventListener("scroll", handleScroll, { passive: true });
-
-        return () => {
-            if (container)
-                container.removeEventListener("scroll", handleScroll);
-        };
-    }, [containerRef, location]);
-
-    useEffect(() => {
-        if (!containerRef.current || !scrollsMap.current || !scrollsMap.current[location.key]) return;
-        containerRef.current.scrollTo(
-            {
-                top: scrollsMap.current[location.key],
-                behavior: "auto"
-            });
-    }, [location]);
-
-    return containerRef;
-}
-
 const DrawerHeader = styled("div")(({ theme }) => ({
     display: "flex",
     flexDirection: "column",
@@ -225,6 +220,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 
 function StyledDrawer(props: MuiDrawerProps & {
     logo?: string,
+    hovered: boolean,
     setDrawerOpen: (open: boolean) => void,
     drawerUrl?: string,
     drawerUrlLabel?: string
@@ -239,6 +235,7 @@ function StyledDrawer(props: MuiDrawerProps & {
         setDrawerOpen,
         drawerUrl = "https://firecms.co/?utm_source=drawer",
         drawerUrlLabel = "firecms.co",
+        hovered,
         ...drawerProps
     } = props;
 
@@ -277,7 +274,11 @@ function StyledDrawer(props: MuiDrawerProps & {
             {...drawerProps}
             variant={largeLayout ? "permanent" : "temporary"}
             open={open}
-            onClose={!largeLayout ? () => setDrawerOpen(false) : undefined}
+            onClose={!largeLayout
+                ? () => {
+                    setDrawerOpen(false);
+                }
+                : undefined}
             sx={{
                 width: DRAWER_WIDTH,
                 flexShrink: 0,
@@ -315,7 +316,9 @@ function StyledDrawer(props: MuiDrawerProps & {
             <Toolbar sx={{
                 position: "absolute",
                 left: open ? "-100%" : 0,
+                right: open ? undefined : 0,
                 opacity: open ? 0.0 : 1.0,
+                backgroundColor: theme.palette.background.default,
                 transition: theme.transitions.create(["left", "opacity"], {
                     easing: theme.transitions.easing.sharp,
                     duration: theme.transitions.duration.enteringScreen
@@ -329,33 +332,35 @@ function StyledDrawer(props: MuiDrawerProps & {
                     : menuIconButton}
             </Toolbar>
 
-            <Link
-                key={"breadcrumb-home"}
-                color="inherit"
-                component={NavLink}
-                to={"."}
-                sx={theme => ({
-                    transition: theme.transitions.create(["padding"], {
-                        easing: theme.transitions.easing.sharp,
-                        duration: theme.transitions.duration.enteringScreen
-                    }),
-                    p: theme.spacing(
-                        open ? 4 : 9,
-                        open ? 12 : 2,
-                        0,
-                        open ? 3 : 2)
-                })}>
-                <Tooltip title={"Home"} placement={"right"}>
-                    <div onClick={() => {
-                        context.onAnalyticsEvent?.("drawer_navigate_to_home");
-                    }}>
-                        {logoComponent}
-                    </div>
-                </Tooltip>
+            <Box sx={{ height: "100%", width: "100%", overflow: "auto" }}>
+                <Link
+                    key={"breadcrumb-home"}
+                    color="inherit"
+                    component={NavLink}
+                    to={"."}
+                    sx={theme => ({
+                        display: "block",
+                        transition: theme.transitions.create(["padding"], {
+                            easing: theme.transitions.easing.sharp,
+                            duration: theme.transitions.duration.enteringScreen
+                        }),
+                        p: theme.spacing(
+                            open ? 4 : 9,
+                            open ? 12 : 2,
+                            0,
+                            open ? 3 : 2)
+                    })}>
+                    <Tooltip title={"Home"} placement={"right"}>
+                        <div onClick={() => {
+                            context.onAnalyticsEvent?.("drawer_navigate_to_home");
+                        }}>
+                            {logoComponent}
+                        </div>
+                    </Tooltip>
 
-            </Link>
-
-            {props.children}
+                </Link>
+                {props.children}
+            </Box>
 
             <Link sx={(theme) => ({
                 width: DRAWER_WIDTH,

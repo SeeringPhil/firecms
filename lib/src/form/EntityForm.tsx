@@ -6,7 +6,7 @@ import React, {
     useRef,
     useState
 } from "react";
-import { Box, Button, Grid, Typography } from "@mui/material";
+import { alpha, Box, Button, Grid, Typography } from "@mui/material";
 import {
     CMSAnalyticsEvent,
     Entity,
@@ -14,9 +14,9 @@ import {
     EntityStatus,
     EntityValues,
     FormContext,
+    PluginFormActionProps,
     PropertyFieldBindingProps,
-    ResolvedEntityCollection,
-    ResolvedProperty
+    ResolvedEntityCollection
 } from "../types";
 import { Form, Formik, FormikHelpers, FormikProps } from "formik";
 import { PropertyFieldBinding } from "./PropertyFieldBinding";
@@ -90,28 +90,64 @@ export interface EntityFormProps<M extends Record<string, any>> {
      */
     onValuesChanged?: (values?: EntityValues<M>) => void;
 
+    /**
+     *
+     * @param id
+     */
+    onIdChange?: (id: string) => void;
+
+    currentEntityId?: string;
+
+    onFormContextChange?: (formContext: FormContext<M>) => void;
+
+    hideId?: boolean;
+
 }
 
-const EntityFormInternal = function EntityForm<M extends Record<string, any>>({
-                                                                                  status,
-                                                                                  path,
-                                                                                  collection: inputCollection,
-                                                                                  entity,
-                                                                                  onEntitySave,
-                                                                                  onDiscard,
-                                                                                  onModified,
-                                                                                  onValuesChanged
-                                                                              }: EntityFormProps<M>) {
+/**
+ * This is the form used internally by the CMS
+ * @param status
+ * @param path
+ * @param collection
+ * @param entity
+ * @param onEntitySave
+ * @param onDiscard
+ * @param onModified
+ * @param onValuesChanged
+ * @constructor
+ * @category Components
+ */
+export const EntityForm = React.memo<EntityFormProps<any>>(EntityFormInternal,
+    (a: EntityFormProps<any>, b: EntityFormProps<any>) => {
+        return a.status === b.status &&
+            a.path === b.path &&
+            equal(a.entity?.values, b.entity?.values);
+    }) as typeof EntityFormInternal;
+
+function EntityFormInternal<M extends Record<string, any>>({
+                                                               status,
+                                                               path,
+                                                               collection: inputCollection,
+                                                               entity,
+                                                               onEntitySave,
+                                                               onDiscard,
+                                                               onModified,
+                                                               onValuesChanged,
+                                                               onIdChange,
+                                                               onFormContextChange,
+                                                               hideId
+                                                           }: EntityFormProps<M>) {
 
     const context = useFireCMSContext();
     const dataSource = useDataSource();
+    const plugins = context.plugins;
 
     const initialResolvedCollection = useMemo(() => resolveCollection({
         collection: inputCollection,
         path,
         values: entity?.values,
         fields: context.fields
-    }), [entity?.values, inputCollection, path]);
+    }), [entity?.values, path]);
 
     const mustSetCustomId: boolean = (status === "new" || status === "copy") &&
         (Boolean(initialResolvedCollection.customId) && initialResolvedCollection.customId !== "optional");
@@ -152,11 +188,16 @@ const EntityFormInternal = function EntityForm<M extends Record<string, any>>({
     const [initialValues, setInitialValues] = useState<EntityValues<M>>(entity?.values ?? baseDataSourceValues as EntityValues<M>);
     const [internalValues, setInternalValues] = useState<EntityValues<M> | undefined>(initialValues);
 
-    const doOnValuesChanges = (values?: EntityValues<M>) => {
+    const doOnValuesChanges = useCallback((values?: EntityValues<M>) => {
         setInternalValues(values);
         if (onValuesChanged)
             onValuesChanged(values);
-    }
+    }, [onValuesChanged]);
+
+    useEffect(() => {
+        if (entityId && onIdChange)
+            onIdChange(entityId);
+    }, [entityId, onIdChange]);
 
     const collection = useMemo(() => resolveCollection<M>({
         collection: inputCollection,
@@ -280,16 +321,51 @@ const EntityFormInternal = function EntityForm<M extends Record<string, any>>({
         <Formik
             initialValues={baseDataSourceValues as M}
             onSubmit={saveValues}
-            validateOnMount={true}
             validationSchema={validationSchema}
             validate={(values) => console.debug("Validating", values)}
             onReset={() => onDiscard && onDiscard()}
         >
             {(props) => {
+
+                const pluginActions: React.ReactNode[] = [];
+
+                // eslint-disable-next-line react-hooks/rules-of-hooks
+                const formContext: FormContext<M> = {
+                    setFieldValue: props.setFieldValue,
+                    values: props.values,
+                    collection: resolveCollection({ collection, path }),
+                    entityId,
+                    path
+                };
+
+                // eslint-disable-next-line react-hooks/rules-of-hooks
+                useEffect(() => {
+                    if (onFormContextChange) {
+                        onFormContextChange(formContext);
+                    }
+                }, [onFormContextChange, formContext]);
+
+                if (plugins && collection) {
+                    const actionProps: PluginFormActionProps = {
+                        entityId,
+                        path,
+                        status,
+                        collection,
+                        context,
+                        currentEntityId: entityId,
+                        formContext
+                    };
+                    pluginActions.push(...plugins.map((plugin, i) => (
+                        plugin.form?.Actions
+                            ? <plugin.form.Actions
+                                key={`actions_${plugin.name}`} {...actionProps}/>
+                            : null
+                    )).filter(Boolean));
+                }
+
                 return <>
 
                     <Box
-
                         sx={(theme) => ({
                             paddingLeft: theme.spacing(4),
                             paddingRight: theme.spacing(4),
@@ -308,14 +384,66 @@ const EntityFormInternal = function EntityForm<M extends Record<string, any>>({
                         })}
                     >
 
-                        <CustomIdField customId={collection.customId}
-                                       entityId={entityId}
-                                       status={status}
-                                       onChange={setEntityId}
-                                       error={entityIdError}
-                                       entity={entity}/>
+                        {pluginActions.length > 0 && <Box
+                            sx={(theme) => ({
+                                width: "100%",
+                                display: "flex",
+                                justifyContent: "flex-end",
+                                background: theme.palette.mode === "light" ? "rgba(255,255,255,0.6)" : alpha(theme.palette.background.paper, 0.1),
+                                backdropFilter: "blur(8px)",
+                                borderBottom: `1px solid ${theme.palette.divider}`,
+                                flexDirection: "row",
+                                alignItems: "center",
+                                position: "absolute",
+                                top: 0,
+                                right: 0,
+                                left: 0,
+                                textAlign: "right",
+                                zIndex: 2,
+                                "& > *:not(:last-child)": {
+                                    [theme.breakpoints.down("md")]: {
+                                        mr: theme.spacing(1)
+                                    },
+                                    mr: theme.spacing(2)
+                                }
+                            })}>
+                            {pluginActions}
+                        </Box>}
 
-                        {entityId && <FormInternal
+                        <Box
+                            sx={(theme) => ({
+                                width: "100%",
+                                marginTop: theme.spacing(4 + (pluginActions ? 4 : 0)),
+                                paddingY: 2,
+                                display: "flex",
+                                alignItems: "center",
+                                [theme.breakpoints.down("lg")]: {
+                                    marginTop: theme.spacing(3 + (pluginActions ? 4 : 0))
+                                },
+                                [theme.breakpoints.down("md")]: {
+                                    marginTop: theme.spacing(2 + (pluginActions ? 4 : 0))
+                                }
+                            })}>
+
+                            <Typography
+                                sx={{
+                                    marginTop: 4,
+                                    marginBottom: collection.hideIdFromForm ? 0 : 4,
+                                    flexGrow: 1
+                                }}
+                                variant={"h4"}>{collection.singularName ?? collection.name + " entry"}
+                            </Typography>
+                        </Box>
+
+                        {!hideId &&
+                            <CustomIdField customId={collection.customId}
+                                           entityId={entityId}
+                                           status={status}
+                                           onChange={setEntityId}
+                                           error={entityIdError}
+                                           entity={entity}/>}
+
+                        {entityId && <InnerForm
                             {...props}
                             initialValues={initialValues}
                             onModified={onModified}
@@ -325,6 +453,7 @@ const EntityFormInternal = function EntityForm<M extends Record<string, any>>({
                             entity={entity}
                             entityId={entityId}
                             collection={collection}
+                            formContext={formContext}
                             status={status}
                             savingError={savingError}
                             closeAfterSaveRef={closeAfterSaveRef}/>}
@@ -334,59 +463,44 @@ const EntityFormInternal = function EntityForm<M extends Record<string, any>>({
             }}
         </Formik>
     );
-};
-/**
- * This is the form used internally by the CMS
- * @param status
- * @param path
- * @param collection
- * @param entity
- * @param onEntitySave
- * @param onDiscard
- * @param onModified
- * @param onValuesChanged
- * @constructor
- * @category Components
- */
-export const EntityForm = React.memo<EntityFormProps<any>>(EntityFormInternal,
-    (a: EntityFormProps<any>, b: EntityFormProps<any>) => {
-        return a.status === b.status &&
-            a.path === b.path &&
-            equal(a.entity?.values, b.entity?.values);
-    }) as typeof EntityFormInternal;
+}
 
-function FormInternal<M extends Record<string, any>>({
-                                                         initialValues,
-                                                         values,
-                                                         onModified,
-                                                         onValuesChanged,
-                                                         underlyingChanges,
-                                                         entityId,
-                                                         entity,
-                                                         touched,
-                                                         setFieldValue,
-                                                         collection,
-                                                         path,
-                                                         isSubmitting,
-                                                         status,
-                                                         handleSubmit,
-                                                         savingError,
-                                                         dirty,
-                                                         errors,
-                                                         closeAfterSaveRef
-                                                     }: FormikProps<M> & {
+function InnerForm<M extends Record<string, any>>(props: FormikProps<M> & {
     initialValues: Partial<M>,
     onModified: ((modified: boolean) => void) | undefined,
     onValuesChanged?: (changedValues?: EntityValues<M>) => void,
     underlyingChanges: Partial<M>,
     path: string
     entity: Entity<M> | undefined,
-    collection: ResolvedEntityCollection<M>,
+    collection: EntityCollection<M>,
     entityId: string,
+    formContext: FormContext<M>,
     status: "new" | "existing" | "copy",
     savingError?: Error,
     closeAfterSaveRef: MutableRefObject<boolean>,
 }) {
+
+    const {
+        initialValues,
+        values,
+        onModified,
+        onValuesChanged,
+        underlyingChanges,
+        entityId,
+        formContext,
+        entity,
+        touched,
+        setFieldValue,
+        collection,
+        path,
+        isSubmitting,
+        status,
+        handleSubmit,
+        savingError,
+        dirty,
+        errors,
+        closeAfterSaveRef
+    } = props;
 
     const modified = dirty;
     useEffect(() => {
@@ -410,17 +524,9 @@ function FormInternal<M extends Record<string, any>>({
         }
     }, [underlyingChanges, entity, values, touched, setFieldValue]);
 
-    const context: FormContext<M> | undefined = {
-        collection,
-        entityId,
-        values,
-        path
-    };
-
     const formFields = (
-        <Grid container spacing={4}>
-            {Object.entries<ResolvedProperty>(collection.properties)
-                .filter(([key, property]) => !isHidden(property))
+        <Grid container spacing={6}>
+            {Object.entries(collection.properties)
                 .map(([key, property]) => {
 
                     const underlyingValueHasChanged: boolean =
@@ -429,18 +535,16 @@ function FormInternal<M extends Record<string, any>>({
                         !!touched[key];
 
                     const disabled = isSubmitting || isReadOnly(property) || Boolean(property.disabled);
-                    const shouldAlwaysRerender = shouldPropertyReRender(property);
                     const cmsFormFieldProps: PropertyFieldBindingProps<any, M> = {
                         propertyKey: key,
                         disabled,
                         property,
                         includeDescription: true,
                         underlyingValueHasChanged,
-                        context,
+                        context: formContext,
                         tableMode: false,
                         partOfArray: false,
-                        autoFocus: false,
-                        shouldAlwaysRerender
+                        autoFocus: false
                     };
 
                     return (
@@ -524,15 +628,4 @@ function FormInternal<M extends Record<string, any>>({
             </CustomDialogActions>
         </Form>
     );
-}
-
-const shouldPropertyReRender = (property: ResolvedProperty): boolean => {
-    const rerenderThisProperty = Boolean(property.Field) || property.fromBuilder;
-    if (property.dataType === "map" && property.properties) {
-        return rerenderThisProperty || Object.values(property.properties).some((childProperty) => shouldPropertyReRender(childProperty));
-    } else if (property.dataType === "array" && Array.isArray(property.resolvedProperties)) {
-        return rerenderThisProperty || property.resolvedProperties.some((childProperty) => childProperty && shouldPropertyReRender(childProperty));
-    } else {
-        return rerenderThisProperty;
-    }
 }

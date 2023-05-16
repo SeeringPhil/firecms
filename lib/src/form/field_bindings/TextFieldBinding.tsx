@@ -1,12 +1,9 @@
 import React, { useCallback } from "react";
 import {
     Box,
-    FilledInput,
-    FormControl,
     FormControlLabel,
     FormHelperText,
     IconButton,
-    InputLabel,
     Switch,
     Typography
 } from "@mui/material";
@@ -17,6 +14,8 @@ import { FieldProps } from "../../types";
 import { FieldDescription } from "../index";
 import { LabelWithIcon } from "../components";
 import { useClearRestoreValue } from "../../hooks";
+import { getIconForProperty } from "../../core";
+import { TextInput } from "../../core/components/fields/TextInput";
 
 interface TextFieldProps<T extends string | number> extends FieldProps<T> {
     allowInfinity?: boolean
@@ -38,8 +37,7 @@ export function TextFieldBinding<T extends string | number>({
                                                                 autoFocus,
                                                                 property,
                                                                 includeDescription,
-                                                                allowInfinity,
-                                                                shouldAlwaysRerender
+                                                                allowInfinity
                                                             }: TextFieldProps<T>) {
 
     let multiline: boolean | undefined;
@@ -84,57 +82,30 @@ export function TextFieldBinding<T extends string | number>({
 
     return (
         <>
+            <TextInput
+                value={value}
+                setValue={setValue}
+                autoFocus={autoFocus}
+                label={<LabelWithIcon icon={getIconForProperty(property)}
+                                      title={property.name}/>}
+                inputType={inputType}
+                multiline={isMultiline}
+                disabled={disabled}
+                endAdornment={
+                    property.clearable && <IconButton
+                        onClick={handleClearClick}>
+                        <ClearIcon/>
+                    </IconButton>
+                }
+                error={showError ? error : undefined}/>
 
-            <FormControl
-                variant="filled"
-                error={showError}
-                disabled={valueIsInfinity}
-                sx={{
-                    // "& .MuiInputLabel-formControl": {
-                    //     mt: 1 / 2,
-                    //     ml: 1 / 2
-                    // },
-                    "& .MuiInputLabel-shrink": {
-                        mt: -1 / 4
-                    }
-                }}
-                fullWidth>
-
-                <InputLabel sx={{ top: "4px" }}>
-                    <LabelWithIcon property={property}/>
-                </InputLabel>
-
-                <FilledInput
-                    sx={{
-                        minHeight: "64px"
-                    }}
-                    autoFocus={autoFocus}
-                    type={inputType}
-                    multiline={isMultiline}
-                    inputProps={{
-                        rows: 4
-                    }}
-                    endAdornment={
-                        property.clearable && <IconButton
-                            sx={{
-                                position: "absolute",
-                                right: "16px"
-                            }}
-                            onClick={handleClearClick}>
-                            <ClearIcon/>
-                        </IconButton>
-                    }
-                    value={valueIsInfinity ? "Infinity" : (value ?? "")}
-                    disabled={disabled}
-                    onChange={(evt) => {
-                        updateValue(evt.target.value as T);
-                    }}
-                />
-
-                <Box display={"flex"}>
+            {(showError || includeDescription || allowInfinity) &&
+                <Box display={"flex"}
+                     sx={{ marginLeft: "14px" }}
+                >
 
                     <Box flexGrow={1}>
-                        {showError && <FormHelperText>{error}</FormHelperText>}
+                        {showError && <FormHelperText error={true}>{error}</FormHelperText>}
 
                         {includeDescription &&
                             <FieldDescription property={property}/>}
@@ -162,19 +133,9 @@ export function TextFieldBinding<T extends string | number>({
                             }
                         />
                     }
-                </Box>
+                </Box>}
 
-            </FormControl>
-            {/*{mediaType && internalValue &&*/}
-            {/*<ErrorBoundary>*/}
-            {/*    <Box m={1}>*/}
-            {/*        <PreviewComponent propertyKey={propertyKey}*/}
-            {/*                          value={internalValue}*/}
-            {/*                          property={property}*/}
-            {/*                          size={"regular"}/>*/}
-            {/*    </Box>*/}
-            {/*</ErrorBoundary>*/}
-            {/*}*/}
+            {/*</FormControl>*/}
         </>
     );
 

@@ -1,4 +1,4 @@
-import React, { ComponentType, ReactElement } from "react";
+import React, { ComponentType, ReactElement, useRef } from "react";
 import equal from "react-fast-compare"
 
 import { FormHelperText } from "@mui/material";
@@ -11,9 +11,13 @@ import {
 } from "formik";
 
 import {
-    CMSType,
+    CMSType, EntityCollection,
     FieldProps,
+    FireCMSPlugin,
+    PluginFieldBuilderParams,
+    Property,
     PropertyFieldBindingProps,
+    PropertyOrBuilder,
     ResolvedProperty
 } from "../types";
 import { ReadOnlyFieldBinding } from "./field_bindings/ReadOnlyFieldBinding";
@@ -21,90 +25,14 @@ import { ReadOnlyFieldBinding } from "./field_bindings/ReadOnlyFieldBinding";
 import {
     ErrorBoundary,
     getFieldConfig,
+    getFieldId,
+    isHidden,
+    isPropertyBuilder,
     isReadOnly,
     resolveProperty
 } from "../core";
 import { useFireCMSContext } from "../hooks";
-
-const PropertyFieldBindingInternal = function PropertyFieldBinding<T extends CMSType = CMSType, CustomProps = any, M extends Record<string, any> = Record<string, any>>
-({
-     propertyKey,
-     property,
-     context,
-     includeDescription,
-     underlyingValueHasChanged,
-     disabled,
-     tableMode,
-     partOfArray,
-     autoFocus,
-     shouldAlwaysRerender
- }: PropertyFieldBindingProps<any, M>): ReactElement<PropertyFieldBindingProps<any, M>> {
-
-    const fireCMSContext = useFireCMSContext();
-
-    let component: ComponentType<FieldProps> | undefined;
-    const resolvedProperty: ResolvedProperty<T> | null = resolveProperty({
-        propertyOrBuilder: property,
-        values: context.values,
-        path: context.path,
-        entityId: context.entityId,
-        fields: fireCMSContext.fields
-    });
-    if (resolvedProperty === null) {
-        return <></>;
-    } else if (isReadOnly(resolvedProperty)) {
-        component = ReadOnlyFieldBinding;
-    } else if (resolvedProperty.Field) {
-        if (typeof resolvedProperty.Field === "function") {
-            component = resolvedProperty.Field as ComponentType<FieldProps>;
-        }
-    } else {
-        const fieldConfig = getFieldConfig(resolvedProperty);
-        if (!fieldConfig) {
-            throw new Error(`INTERNAL: Could not find field config for property ${propertyKey}`);
-        }
-        component = fieldConfig.Field as ComponentType<FieldProps>;
-    }
-
-    if (component) {
-
-        const componentProps: PropertyFieldBindingProps<T, M> = {
-            propertyKey,
-            property: resolvedProperty as ResolvedProperty<T>,
-            includeDescription,
-            underlyingValueHasChanged,
-            context,
-            disabled,
-            tableMode,
-            partOfArray,
-            autoFocus,
-            shouldAlwaysRerender
-        };
-
-        // we use the standard Field for user defined fields, since it rebuilds
-        // when there are changes in other values, in contrast to FastField
-        const FieldComponent = shouldAlwaysRerender || resolvedProperty.Field ? Field : FastField;
-
-        return (
-            <FieldComponent
-                required={resolvedProperty.validation?.required}
-                name={`${propertyKey}`}
-            >
-                {(fieldProps: FormikFieldProps<T>) => {
-                    return <FieldInternal
-                        Component={component as ComponentType<FieldProps>}
-                        componentProps={componentProps}
-                        fieldProps={fieldProps}/>;
-                }}
-            </FieldComponent>
-        );
-
-    }
-
-    return (
-        <div>{`Currently the field ${resolvedProperty.dataType} is not supported`}</div>
-    );
-}
+import path from "path";
 
 /**
  * This component renders a form field creating the corresponding configuration
@@ -120,7 +48,7 @@ const PropertyFieldBindingInternal = function PropertyFieldBinding<T extends CMS
  * **validation** passed in the property will have no effect. You need to set
  * the validation in the `EntityCollection` definition.
  *
- * @param name You can use nested names such as `address.street` or `friends[2]`
+ * @param propertyKey You can use nested names such as `address.street` or `friends[2]`
  * @param property
  * @param context
  * @param includeDescription
@@ -129,14 +57,123 @@ const PropertyFieldBindingInternal = function PropertyFieldBinding<T extends CMS
  * @param tableMode
  * @param partOfArray
  * @param autoFocus
- * @param shouldAlwaysRerender
  * @category Form custom fields
  */
+// export const PropertyFieldBinding = PropertyFieldBindingInternal;
 export const PropertyFieldBinding = React.memo(PropertyFieldBindingInternal, (a: PropertyFieldBindingProps<any>, b: PropertyFieldBindingProps<any>) => {
-    return equal(a.context.values, b.context.values) &&
-        ((typeof a.property === "function" && typeof b.property === "function") || equal(a.property, b.property)) &&
-        a.disabled === b.disabled
+
+    const aIsBuilder = isPropertyBuilder(a.property) || a.property.fromBuilder;
+    const bIsBuilder = isPropertyBuilder(b.property) || b.property.fromBuilder;
+
+    const baseCheck = (aIsBuilder === bIsBuilder || equal(a.property, b.property)) &&
+        a.disabled === b.disabled;
+    if (!baseCheck) {
+        return false;
+    }
+
+    if (shouldPropertyReRender(b.property)) {
+        return false;
+    }
+
+    return false;
 }) as typeof PropertyFieldBindingInternal;
+
+function PropertyFieldBindingInternal<T extends CMSType = CMSType, CustomProps = any, M extends Record<string, any> = Record<string, any>>
+({
+     propertyKey,
+     property,
+     context,
+     includeDescription,
+     underlyingValueHasChanged,
+     disabled,
+     tableMode,
+     partOfArray,
+     autoFocus,
+     context: {
+         values,
+         collection,
+         path,
+         entityId
+     }
+ }: PropertyFieldBindingProps<T, M>): ReactElement<PropertyFieldBindingProps<T, M>> {
+
+    const fireCMSContext = useFireCMSContext();
+
+    const shouldAlwaysRerender = shouldPropertyReRender(property, fireCMSContext.plugins);
+    // console.log("shouldAlwaysRerender", shouldAlwaysRerender, propertyKey)
+    // we use the standard Field for user defined fields, since it rebuilds
+    // when there are changes in other values, in contrast to FastField
+    const FieldComponent = shouldAlwaysRerender ? Field : FastField;
+
+    return (
+        <FieldComponent
+            // required={property.validation?.required}
+            name={propertyKey}
+        >
+            {(fieldProps: FormikFieldProps<T>) => {
+
+                let Component: ComponentType<FieldProps<T>> | undefined;
+                const resolvedProperty: ResolvedProperty<T> | null = resolveProperty({
+                    propertyKey,
+                    propertyValue: fieldProps.field.value,
+                    propertyOrBuilder: property,
+                    values: fieldProps.form.values,
+                    path: context.path,
+                    entityId: context.entityId,
+                    fields: fireCMSContext.fields
+                });
+
+                if (resolvedProperty === null || isHidden(resolvedProperty)) {
+                    return <></>;
+                } else if (isReadOnly(resolvedProperty)) {
+                    Component = ReadOnlyFieldBinding;
+                } else if (resolvedProperty.Field) {
+                    if (typeof resolvedProperty.Field === "function") {
+                        Component = resolvedProperty.Field as ComponentType<FieldProps<any>>;
+                    }
+                } else {
+                    const fieldConfig = getFieldConfig(resolvedProperty);
+                    if (!fieldConfig) {
+                        throw new Error(`INTERNAL: Could not find field config for property ${propertyKey}`);
+                    }
+                    Component = fieldConfig.Field as ComponentType<FieldProps<T>>;
+
+                }
+                if (!Component) {
+                    return (
+                        <div>{`Currently the field ${resolvedProperty.dataType} is not supported`}</div>
+                    );
+                    // return null;
+                }
+
+                const componentProps: ResolvedPropertyFieldBindingProps<T, M> = {
+                    propertyKey,
+                    property: resolvedProperty,
+                    includeDescription,
+                    underlyingValueHasChanged,
+                    context,
+                    disabled,
+                    tableMode,
+                    partOfArray,
+                    autoFocus
+                };
+
+                return <FieldInternal
+                    Component={Component as ComponentType<FieldProps>}
+                    componentProps={componentProps}
+                    fieldProps={fieldProps}/>;
+            }}
+        </FieldComponent>
+    );
+
+}
+
+
+type ResolvedPropertyFieldBindingProps<T extends CMSType = CMSType, M extends Record<string, any> = Record<string, any>> =
+    Omit<PropertyFieldBindingProps<T, M>, "property">
+    & {
+    property: ResolvedProperty<T>
+};
 
 function FieldInternal<T extends CMSType, CustomProps, M extends Record<string, any>>
 ({
@@ -150,16 +187,17 @@ function FieldInternal<T extends CMSType, CustomProps, M extends Record<string, 
          partOfArray,
          autoFocus,
          context,
-         disabled,
-         shouldAlwaysRerender
+         disabled
      },
      fieldProps
  }:
      {
          Component: ComponentType<FieldProps<T, any, M>>,
-         componentProps: PropertyFieldBindingProps<T, M>,
+         componentProps: ResolvedPropertyFieldBindingProps<T, M>,
          fieldProps: FormikFieldProps<T>
      }) {
+
+    const { plugins } = useFireCMSContext();
 
     const customFieldProps: any = property.customProps;
     const value = fieldProps.field.value;
@@ -171,15 +209,23 @@ function FieldInternal<T extends CMSType, CustomProps, M extends Record<string, 
         (fieldProps.form.submitCount > 0 || property.validation?.unique) &&
         (!Array.isArray(error) || !!error.filter((e: any) => !!e).length);
 
+    const WrappedComponent: ComponentType<FieldProps<T, any, M>> | null = useWrappedComponent(context.path, context.collection, propertyKey, property, Component, plugins);
+    const UsedComponent: ComponentType<FieldProps<T>> = WrappedComponent ?? Component;
+    // const UsedComponent: ComponentType<FieldProps<T>> = Component;
+
     const isSubmitting = fieldProps.form.isSubmitting;
 
     const cmsFieldProps: FieldProps<T, CustomProps, M> = {
         propertyKey,
         value: value as T,
         initialValue,
-        setValue: (value: T | null) => {
+        setValue: (value: T | null, shouldValidate?: boolean) => {
             fieldProps.form.setFieldTouched(propertyKey, true, false);
-            fieldProps.form.setFieldValue(propertyKey, value);
+            fieldProps.form.setFieldValue(propertyKey, value, shouldValidate);
+        },
+        setFieldValue: (otherPropertyKey: string, value: CMSType | null, shouldValidate?: boolean) => {
+            fieldProps.form.setFieldTouched(propertyKey, true, false);
+            fieldProps.form.setFieldValue(otherPropertyKey, value, shouldValidate);
         },
         error,
         touched,
@@ -193,14 +239,13 @@ function FieldInternal<T extends CMSType, CustomProps, M extends Record<string, 
         partOfArray: partOfArray ?? false,
         autoFocus: autoFocus ?? false,
         customProps: customFieldProps,
-        context,
-        shouldAlwaysRerender: shouldAlwaysRerender ?? true
+        context
     };
 
     return (
         <ErrorBoundary>
 
-            <Component {...cmsFieldProps}/>
+            <UsedComponent {...cmsFieldProps}/>
 
             {underlyingValueHasChanged && !isSubmitting &&
                 <FormHelperText>
@@ -209,4 +254,62 @@ function FieldInternal<T extends CMSType, CustomProps, M extends Record<string, 
 
         </ErrorBoundary>);
 
+}
+
+const shouldPropertyReRender = (property: PropertyOrBuilder | ResolvedProperty, plugins?: FireCMSPlugin[]): boolean => {
+    if (plugins?.some((plugin) => plugin.form?.fieldBuilder)) {
+        return true;
+    }
+    if (isPropertyBuilder(property)) {
+        return true;
+    }
+    const defAProperty = property as Property | ResolvedProperty;
+    const rerenderThisProperty = Boolean(defAProperty.Field) || ("fromBuilder" in defAProperty && defAProperty.fromBuilder);
+    if (defAProperty.dataType === "map" && defAProperty.properties) {
+        return rerenderThisProperty || Object.values(defAProperty.properties).some((childProperty) => shouldPropertyReRender(childProperty, plugins));
+    } else if (defAProperty.dataType === "array" && "resolvedProperties" in defAProperty) {
+        // @ts-ignore
+        return rerenderThisProperty || defAProperty.resolvedProperties?.some((childProperty) => childProperty && shouldPropertyReRender(childProperty, plugins));
+    } else {
+        return rerenderThisProperty;
+    }
+}
+
+function useWrappedComponent<T extends CMSType = CMSType, M extends Record<string, any> = any>(
+    path: string,
+    collection: EntityCollection<M>,
+    propertyKey: string,
+    property: ResolvedProperty<T>,
+    Component: ComponentType<FieldProps<T, any, M>>,
+    plugins?: FireCMSPlugin[]
+): ComponentType<FieldProps<T, any, M>> | null {
+
+    const wrapperRef = useRef<ComponentType<FieldProps<T, any, M>> | null>((() => {
+        let Wrapper: ComponentType<FieldProps<T, any, M>> | null = null;
+        if (plugins) {
+            plugins.forEach((plugin) => {
+                const fieldId = getFieldId(property);
+                if (fieldId && plugin.form?.fieldBuilder) {
+                    const params: PluginFieldBuilderParams<T> = {
+                        fieldConfigId: fieldId,
+                        propertyKey,
+                        property,
+                        Field: Component,
+                        plugin,
+                        path,
+                        collection
+                    };
+                    const enabled = plugin.form?.fieldBuilderEnabled?.(params);
+                    if (enabled === undefined || enabled)
+                        Wrapper = plugin.form.fieldBuilder(params) || Wrapper;
+                }
+                if (!fieldId) {
+                    console.warn("INTERNAL: Field id not found for property", property);
+                }
+            });
+        }
+        return Wrapper;
+    })());
+
+    return wrapperRef.current;
 }

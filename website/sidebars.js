@@ -6,6 +6,7 @@ module.exports = {
             id: "intro"
         },
         "quickstart",
+        "openai",
         "new_in_v2",
         {
             type: "category",
@@ -17,6 +18,7 @@ module.exports = {
                 "collections/permissions",
                 "collections/exporting_data",
                 "collections/text_search",
+                "collections/dynamic_collections",
             ]
         },
         {

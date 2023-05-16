@@ -17,7 +17,9 @@ export interface FetchEntityProps<M extends Record<string, any> = any> {
 /**
  * @category Datasource
  */
-export type ListenEntityProps<M extends Record<string, any> = any> = FetchEntityProps<M> & {
+export type ListenEntityProps<M extends Record<string, any> = any> =
+    FetchEntityProps<M>
+    & {
     onUpdate: (entity: Entity<M>) => void,
     onError?: (error: Error) => void,
 }
@@ -87,15 +89,15 @@ export interface DataSource {
      * @see useCollectionFetch if you need this functionality implemented as a hook
      */
     fetchCollection<M extends Record<string, any> = any>({
-                           path,
-                           collection,
-                           filter,
-                           limit,
-                           startAfter,
-                           orderBy,
-                           order,
-                           searchString
-                       }: FetchCollectionProps<M>
+                                                             path,
+                                                             collection,
+                                                             filter,
+                                                             limit,
+                                                             startAfter,
+                                                             orderBy,
+                                                             order,
+                                                             searchString
+                                                         }: FetchCollectionProps<M>
     ): Promise<Entity<M>[]>;
 
     /**
@@ -136,10 +138,10 @@ export interface DataSource {
      * @param collection
      */
     fetchEntity<M extends Record<string, any> = any>({
-                       path,
-                       entityId,
-                       collection
-                   }: FetchEntityProps<M>
+                                                         path,
+                                                         entityId,
+                                                         collection
+                                                     }: FetchEntityProps<M>
     ): Promise<Entity<M> | undefined>;
 
     /**
@@ -152,12 +154,12 @@ export interface DataSource {
      * @return Function to cancel subscription
      */
     listenEntity?<M extends Record<string, any> = any>({
-                         path,
-                         entityId,
-                         collection,
-                         onUpdate,
-                         onError
-                     }: ListenEntityProps<M>): () => void;
+                                                           path,
+                                                           entityId,
+                                                           collection,
+                                                           onUpdate,
+                                                           onError
+                                                       }: ListenEntityProps<M>): () => void;
 
     /**
      * Save entity to the specified path

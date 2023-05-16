@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React from "react";
 import { FieldProps, Properties, ResolvedProperties } from "../../types";
 import {
     Box,
@@ -10,7 +10,12 @@ import {
 } from "@mui/material";
 import { SelectChangeEvent } from "@mui/material/Select";
 
-import { ExpandablePanel, isHidden, pick } from "../../core";
+import {
+    ExpandablePanel,
+    getIconForProperty,
+    isHidden,
+    pick
+} from "../../core";
 import { FieldDescription, LabelWithIcon } from "../components";
 import { useClearRestoreValue } from "../../hooks";
 import { PropertyFieldBinding } from "../PropertyFieldBinding";
@@ -23,19 +28,18 @@ import { PropertyFieldBinding } from "../PropertyFieldBinding";
  * @category Form fields
  */
 export function MapFieldBinding<T extends Record<string, any>>({
-                                                      propertyKey,
-                                                      value,
-                                                      showError,
-                                                      disabled,
-                                                      property,
-                                                      setValue,
-                                                      tableMode,
-                                                      includeDescription,
-                                                      underlyingValueHasChanged,
-                                                      autoFocus,
-                                                      shouldAlwaysRerender,
-                                                      context
-                                                  }: FieldProps<T>) {
+                                                                   propertyKey,
+                                                                   value,
+                                                                   showError,
+                                                                   disabled,
+                                                                   property,
+                                                                   setValue,
+                                                                   tableMode,
+                                                                   includeDescription,
+                                                                   underlyingValueHasChanged,
+                                                                   autoFocus,
+                                                                   context
+                                                               }: FieldProps<T>) {
 
     const pickOnlySomeKeys = property.pickOnlySomeKeys || false;
     const expanded = (property.expanded === undefined ? true : property.expanded) || autoFocus;
@@ -62,40 +66,8 @@ export function MapFieldBinding<T extends Record<string, any>>({
         setValue
     });
 
-    const buildPickKeysSelect = useCallback(() => {
-
-        const keys = Object.keys(property.properties!)
-            .filter((key) => !value || !(key in value));
-
-        const handleAddProperty = (event: SelectChangeEvent) => {
-            setValue({
-                ...value,
-                [event.target.value as string]: null
-            });
-        };
-
-        if (!keys.length) return <></>;
-
-        return <Box m={1}>
-            <FormControl fullWidth>
-                <InputLabel>Add property</InputLabel>
-                <Select
-                    variant={"standard"}
-                    value={""}
-                    disabled={disabled}
-                    onChange={handleAddProperty}>
-                    {keys.map((key) => (
-                        <MenuItem key={key} value={key}>
-                            {(property.properties as Properties)[key].name || key}
-                        </MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
-        </Box>;
-    }, [disabled, property.properties, setValue, value]);
-
     const mapFormView = <>
-        <Grid container spacing={2}>
+        <Grid container spacing={2} sx={{ py: 1 }}>
             {Object.entries(mapProperties)
                 .filter(([_, property]) => !isHidden(property))
                 .map(([entryKey, childProperty], index) => {
@@ -108,8 +80,7 @@ export function MapFieldBinding<T extends Record<string, any>>({
                             context,
                             tableMode: false,
                             partOfArray: false,
-                            autoFocus: autoFocus && index === 0,
-                            shouldAlwaysRerender: childProperty.fromBuilder
+                            autoFocus: autoFocus && index === 0
                         };
                         return (
                             <Grid item
@@ -123,16 +94,17 @@ export function MapFieldBinding<T extends Record<string, any>>({
                 )}
         </Grid>
 
-        {pickOnlySomeKeys && buildPickKeysSelect()}
+        {pickOnlySomeKeys && buildPickKeysSelect(disabled, property.properties, setValue, value)}
 
     </>;
 
-    const title = <LabelWithIcon property={property}/>;
+    const title = <LabelWithIcon icon={getIconForProperty(property)}
+                                 title={property.name}/>;
 
     return (
         <FormControl fullWidth error={showError}>
 
-            {!tableMode && <ExpandablePanel expanded={expanded}
+            {!tableMode && <ExpandablePanel initiallyExpanded={expanded}
                                             title={title}>{mapFormView}</ExpandablePanel>}
 
             {tableMode && mapFormView}
@@ -142,3 +114,36 @@ export function MapFieldBinding<T extends Record<string, any>>({
         </FormControl>
     );
 }
+
+const buildPickKeysSelect = (disabled: boolean, properties: Properties, setValue: (value: any) => void, value: any) => {
+
+    const keys = Object.keys(properties)
+        .filter((key) => !value || !(key in value));
+
+    const handleAddProperty = (event: SelectChangeEvent) => {
+        setValue({
+            ...value,
+            [event.target.value as string]: null
+        });
+    };
+
+    if (!keys.length) return <></>;
+
+    return <Box m={1}>
+        <FormControl fullWidth>
+            <InputLabel>Add property</InputLabel>
+            <Select
+                variant={"standard"}
+                value={""}
+                disabled={disabled}
+                onChange={handleAddProperty}>
+                {keys.map((key) => (
+                    <MenuItem key={key} value={key}>
+                        {(properties as Properties)[key].name || key}
+                    </MenuItem>
+                ))}
+            </Select>
+        </FormControl>
+    </Box>;
+};
+

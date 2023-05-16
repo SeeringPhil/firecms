@@ -17,6 +17,7 @@ export function CenteredView({
     return (
         <Fade
             in={true}
+            appear={true}
             timeout={fadeTimeout}
             mountOnEnter
             unmountOnExit>
@@ -26,6 +27,9 @@ export function CenteredView({
                     flexDirection: "column",
                     alignItems: "center",
                     height: fullScreen ? "100vh" : "100%",
+                    "@supports (height: 100dvh)": {
+                        height: fullScreen ? "100dvh" : "100%"
+                    },
                     justifyContent: !maxWidth ? "center" : undefined,
                     maxHeight: "100%",
                     gap: 2,

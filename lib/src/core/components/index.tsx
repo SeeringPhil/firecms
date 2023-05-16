@@ -4,8 +4,8 @@ export { ErrorView } from "./ErrorView";
 export type { EntityPreviewProps } from "./EntityPreview";
 export { EntityPreview } from "./EntityPreview";
 
-export type { ReferenceDialogProps } from "./ReferenceSelectionView";
-export { ReferenceSelectionView } from "./ReferenceSelectionView";
+export type { ReferenceSelectionInnerProps } from "./ReferenceSelectionInner";
+export { ReferenceSelectionInner } from "./ReferenceSelectionInner";
 
 export { CircularProgressCenter } from "./CircularProgressCenter";
 
@@ -25,5 +25,10 @@ export * from "./DeleteConfirmationDialog";
 export * from "./FireCMSLogo";
 
 export * from "./CenteredView";
+export * from "./InfoLabel";
+export * from "./FireCMSAppBar";
 
 export * from "./fields/FilledSelect";
+export * from "./fields/TextInput";
+export * from "./fields/TextareaAutosize";
+export * from "./fields/DisabledTextField";

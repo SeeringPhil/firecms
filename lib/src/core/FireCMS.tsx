@@ -18,7 +18,8 @@ import {
     useBuildSideDialogsController
 } from "./internal/useBuildSideDialogsController";
 import {
-    FireCMSContextInstance, useFireCMSContext,
+    FireCMSContextInstance,
+    useFireCMSContext,
     useModeController,
     useSnackbarController
 } from "../hooks";
@@ -36,7 +37,6 @@ import { AuthControllerContext } from "./contexts/AuthControllerContext";
 import {
     SideDialogsControllerContext
 } from "./contexts/SideDialogsControllerContext";
-import { useTraceUpdate } from "./util/useTraceUpdate";
 
 const DEFAULT_COLLECTION_PATH = "/c";
 
@@ -73,6 +73,7 @@ export function FireCMS<UserType extends User>(props: FireCMSProps<UserType>) {
     const usedBasePath = basePath ?? "/";
     const usedBasedCollectionPath = baseCollectionPath ?? DEFAULT_COLLECTION_PATH;
 
+    // @ts-ignore
     const dateUtilsLocale = locale ? locales[locale] : undefined;
 
     const navigation = useBuildNavigationContext({
@@ -89,8 +90,6 @@ export function FireCMS<UserType extends User>(props: FireCMSProps<UserType>) {
 
     const sideDialogsController = useBuildSideDialogsController();
     const sideEntityController = useBuildSideEntityController(navigation, sideDialogsController);
-
-    const snackbarController = useSnackbarController();
 
     const loading = authController.initialLoading || navigation.loading || (plugins?.some(p => p.loading) ?? false);
 
@@ -115,14 +114,6 @@ export function FireCMS<UserType extends User>(props: FireCMSProps<UserType>) {
     }
 
     const context: Partial<FireCMSContext> = {
-        // authController,
-        // sideDialogsController,
-        // sideEntityController,
-        // navigation,
-        // dataSource,
-        // storageSource,
-        // snackbarController,
-        // userConfigPersistence,
         entityLinkBuilder,
         dateTimeFormat,
         locale,
@@ -191,12 +182,12 @@ function FireCMSInternal({
     const plugins = context.plugins;
     if (!loading && plugins) {
         plugins.forEach((plugin: FireCMSPlugin) => {
-            if (plugin.wrapperComponent) {
+            if (plugin.provider) {
                 childrenResult = (
-                    <plugin.wrapperComponent.Component {...plugin.wrapperComponent.props}
-                                                       context={context}>
+                    <plugin.provider.Component {...plugin.provider.props}
+                                               context={context}>
                         {childrenResult}
-                    </plugin.wrapperComponent.Component>
+                    </plugin.provider.Component>
                 );
             }
         });

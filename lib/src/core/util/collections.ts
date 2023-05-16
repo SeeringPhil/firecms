@@ -1,8 +1,7 @@
 import {
     EntityCollection,
     PropertiesOrBuilders,
-    PropertyOrBuilder,
-    ResolvedEntityCollection
+    PropertyOrBuilder
 } from "../../types";
 import { mergeDeep } from "./objects";
 import { isPropertyBuilder } from "./entities";
@@ -89,11 +88,4 @@ export function sortProperties<M extends Record<string, any>>(properties: Proper
         console.error("Error sorting properties", e);
         return properties;
     }
-}
-
-export function getFirstAdditionalView<M extends Record<string, any>>(collection: EntityCollection<M> | ResolvedEntityCollection<M>) {
-    if (collection.defaultAdditionalView)
-        return { path: collection.defaultAdditionalView }
-    else
-        return undefined
 }

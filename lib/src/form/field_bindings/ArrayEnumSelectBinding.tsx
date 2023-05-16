@@ -21,7 +21,7 @@ import {
     isEnumValueDisabled
 } from "../../core/util/enums";
 import { ArrayEnumPreview, EnumValuesChip } from "../../preview";
-import { ErrorView } from "../../core";
+import { ErrorView, getIconForProperty } from "../../core";
 
 /**
  * This fields renders a dropdown with multiple selection.
@@ -93,19 +93,22 @@ export function ArrayEnumSelectBinding({
         >
 
             <InputLabel id={`${propertyKey}-multiselect-label`}>
-                <LabelWithIcon property={property}/>
+                <LabelWithIcon icon={getIconForProperty(property)}
+                               title={property.name}/>
             </InputLabel>
 
             <MuiSelect
                 multiple
-                sx={{
-                    minHeight: "64px"
-                }}
+                sx={(theme) => ({
+                    minHeight: "64px",
+                    borderRadius: `${theme.shape.borderRadius}px`
+                })}
                 variant={"filled"}
                 labelId={`${propertyKey}-multiselect-label`}
                 value={validValue ? value.map(v => v.toString()) : []}
                 autoFocus={autoFocus}
                 disabled={disabled}
+                disableUnderline={true}
                 endAdornment={
                     of.clearable && <IconButton
                         sx={{
@@ -159,7 +162,7 @@ export function ArrayEnumSelectBinding({
             {includeDescription &&
                 <FieldDescription property={property}/>}
 
-            {showError && <FormHelperText>{error}</FormHelperText>}
+            {showError && <FormHelperText error={true}>{error}</FormHelperText>}
 
         </FormControl>
     );

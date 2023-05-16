@@ -1,3 +1,4 @@
+// @ts-ignore
 import path from "path";
 import { defineConfig } from "vite"
 import react from "@vitejs/plugin-react"
@@ -33,7 +34,8 @@ export default defineConfig({
         })],
     resolve: {
         alias: {
-            firecms: path.resolve(__dirname, "../lib/src")
+            firecms: path.resolve(__dirname, "../lib/src"),
+            "@firecms/data_enhancement": path.resolve(__dirname, "../data_enhancement/src")
         }
     }
 })

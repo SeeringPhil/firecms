@@ -10,6 +10,7 @@ import { FieldProps } from "../../types";
 import { FieldDescription } from "../index";
 import { LabelWithIcon } from "../components";
 import { useClearRestoreValue } from "../../hooks";
+import { getIconForProperty } from "../../core";
 
 type DateTimeFieldProps = FieldProps<Date>;
 
@@ -30,8 +31,7 @@ export function DateTimeFieldBinding({
                                          disabled,
                                          touched,
                                          property,
-                                         includeDescription,
-                                         shouldAlwaysRerender
+                                         includeDescription
                                      }: DateTimeFieldProps) {
 
     const internalValue = value || null;
@@ -60,19 +60,27 @@ export function DateTimeFieldBinding({
                     (
                         <MuiTextField {...params}
                                       fullWidth
-                                      sx={{
-                                          minHeight: "64px"
-                                      }}
+                                      sx={(theme) => ({
+                                          minHeight: "64px",
+                                          borderRadius: `${theme.shape.borderRadius}px`
+                                      })}
                                       label={
-                                          <LabelWithIcon property={property}/>
+                                          <LabelWithIcon
+                                              icon={getIconForProperty(property)}
+                                              title={property.name}/>
                                       }
                                       InputProps={{
                                           ...params.InputProps,
-                                          sx: {
-                                              minHeight: "64px"
-                                          },
+                                          sx: (theme) => ({
+                                              minHeight: "64px",
+                                              borderRadius: `${theme.shape.borderRadius}px`
+                                          }),
+                                          disableUnderline: true,
                                           endAdornment: <Box
-                                              sx={{ pr: 2, gap: 2 }}>
+                                              sx={{
+                                                  pr: 2,
+                                                  gap: 2
+                                              }}>
                                               {property.clearable && <IconButton
                                                   sx={{
                                                       position: "absolute",

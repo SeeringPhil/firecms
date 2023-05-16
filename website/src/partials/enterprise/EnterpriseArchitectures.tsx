@@ -10,52 +10,54 @@ export function EnterpriseArchitectures() {
     return (
         <>
 
-            <Panel color={"secondary"}>
+            <Panel color={"secondary"} centered={true}>
                 <h4 className="h1 mb-4 uppercase">
                     Open source is the path to success
                 </h4>
             </Panel>
 
             <TwoColumns
-                left={<>
+                left={<div className={"text-2xl "}>
 
-                    <h2 className={"h2"}>It fits your architecture</h2>
-                    <p className={"text-xl "}>
-                        Every company needs to manage content in different ways.
+
+                    <h2 className={"h2"}>Adaptable to Your Architecture</h2>
+                    <p>
+                        Our team has developed comprehensive solutions for
+                        numerous successful companies and gained expertise in
+                        various architectures. We can assist you in building a
+                        scalable infrastructure.
+
+                    </p>
+                    <p>
+                        Firebase and FireCMS can be integrated into your
+                        existing architecture, or we can help you develop a new
+                        one.
+
+                    </p>
+                    <p>
+                        Your data and services will be hosted in your own
+                        Firebase project, allowing you to implement your own
+                        authentication and authorization system.
+
                     </p>
 
                     <p>
-                        We have developed the full stack for multiple
-                        successful companies. We have experience with different
-                        architectures and we can help you build a scalable
-                        infrastructure.
-                    </p>
-                    <p>
-                        You can fit Firebase and FireCMS to your existing
-                        architecture or we can help you build a new one.
-                    </p>
-                    <p>
-                        All the data and services are hosted in your own
-                        Firebase
-                        project. You can use your own authentication and
-                        authorization system.
+                        As a headless CMS, FireCMS is compatible with <b>any
+                        frontend framework</b> and is not limited to a specific
+                        rendering layer, unlike traditional CMSs.
+
                     </p>
 
-                    <p>
-                        FireCMS is a headless CMS, which means that it can be
-                        used
-                        with any frontend framework. Unlike traditional CMSs, it
-                        is not coupled to the rendering layer.
-                    </p>
-
-                </>}
+                </div>}
                 right={<>
                     <SimpleArchitecture className={"w-full mt-8"}/>
-                    <label className={"text-sm text-center m-4"}>Simple architecture</label>
+                    <label className={"text-sm text-center m-4"}>Simple
+                        architecture</label>
                     <ComplexArchitecture className={"w-full mt-16"}/>
-                    <label className={"text-sm text-center m-4"}>Architecture using microservices</label>
+                    <label className={"text-sm text-center m-4"}>Architecture
+                        using microservices</label>
                 </>
-                    }/>
+                }/>
 
         </>
     );

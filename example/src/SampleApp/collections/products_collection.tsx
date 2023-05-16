@@ -55,7 +55,10 @@ export const localeCollection = buildCollection<Locale>({
 const productAdditionalField: AdditionalFieldDelegate<Product> = {
     id: "spanish_title",
     name: "Spanish title",
-    Builder: ({ entity, context }) =>
+    Builder: ({
+                  entity,
+                  context
+              }) =>
         <AsyncPreviewComponent builder={
             context.dataSource.fetchEntity({
                 path: `${entity.path}/${entity.id}/locales`,
@@ -112,25 +115,40 @@ export const productsCollection = buildCollection<Product>({
     }),
     Actions: SampleCollectionActions,
     subcollections: [localeCollection],
-    defaultAdditionalView: "locales",
+    // defaultSelectedView: "sample_custom_view",
     views: [
         {
             path: "sample_custom_view",
             name: "Custom view",
-            builder: ({ collection, entity, modifiedValues }) =>
+            Builder: ({
+                          collection,
+                          entity,
+                          modifiedValues
+                      }) =>
                 <SampleProductsView entity={entity}
                                     modifiedValues={modifiedValues}/>
         }
     ],
     additionalFields: [productAdditionalField],
     // propertiesOrder: ["name", "price", "category", "spanish_title", "currency", "locales"],
-    filterCombinations: [{
-        category: "desc",
-        available: "desc"
-    }, { category: "asc", available: "desc" }, {
-        category: "desc",
-        available: "asc"
-    }, { category: "asc", available: "asc" }],
+    filterCombinations: [
+        {
+            category: "asc",
+            available: "desc"
+        },
+        {
+            category: "asc",
+            available: "asc"
+        },
+        {
+            category: "desc",
+            available: "desc"
+        },
+        {
+            category: "desc",
+            available: "asc"
+        }
+    ],
     properties: {
         name: {
             dataType: "string",
@@ -278,6 +296,61 @@ export const productsCollection = buildCollection<Product>({
             dataType: "string",
             readOnly: true,
             description: "This field gets updated with a preSave callback"
+        },
+        added_on: {
+            dataType: "date",
+            name: "Added on",
+            autoValue: "on_create"
+        }
+
+    }
+
+});
+export const productsSimpleCollection = buildCollection<any>({
+    path: "products",
+    name: "Products",
+    singularName: "Product",
+    group: "Main",
+    icon: "ShoppingCart",
+    properties: {
+        name: {
+            dataType: "string",
+            name: "Name",
+            description: "Name of this product",
+            clearable: true,
+            validation: {
+                required: true
+            }
+        },
+        category: {
+            dataType: "string",
+            name: "Category",
+            clearable: true,
+            enumValues: categories
+        },
+        price: {
+            dataType: "number",
+            name: "Price",
+        },
+        brand: {
+            dataType: "string",
+            name: "Brand",
+            validation: {
+                required: true
+            }
+        },
+        description: {
+            dataType: "string",
+            name: "Description",
+            description: "Example of a markdown field",
+            markdown: true
+        },
+        tags: {
+            dataType: "array",
+            name: "Tags",
+            of: {
+                dataType: "string"
+            }
         },
         added_on: {
             dataType: "date",

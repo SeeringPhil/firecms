@@ -7,7 +7,7 @@ module.exports = {
     onBrokenLinks: "warn",
     onBrokenMarkdownLinks: "warn",
     favicon: "img/favicon.ico",
-    organizationName: "Camberi",
+    organizationName: "FireCMS",
     projectName: "FireCMS",
     customFields: {
         env: process.env.NODE_ENV,
@@ -31,9 +31,9 @@ module.exports = {
     themeConfig: {
         image: "img/logo_small.png",
         announcementBar: {
-            id: "package_rename",
+            id: "openai",
             content:
-                "The package has been renamed to <code>firecms</code> from <code>@camberi/firecms</code> since version 2.0.0-beta.1",
+                "Be the first to try out <a href='/openai'>ChatGPT content generation integration plugin</a>! 🚀",
             backgroundColor: "#FF5B79",
             textColor: "black",
             isCloseable: true,
@@ -75,14 +75,24 @@ module.exports = {
                     position: "left"
                 },
                 {
-                    type: "docSidebar",
-                    sidebarId: "docsSidebar",
-                    label: "Docs",
+                    to: "enterprise",
+                    label: "Enterprise",
                     position: "left"
                 },
                 {
-                    to: "enterprise",
-                    label: "Enterprise",
+                    to: "openai",
+                    label: "ChatGPT",
+                    position: "left"
+                },
+                // {
+                //     to: "pricing",
+                //     label: "Pricing",
+                //     position: "left"
+                // },
+                {
+                    type: "docSidebar",
+                    sidebarId: "docsSidebar",
+                    label: "Docs",
                     position: "left"
                 },
                 {
@@ -96,24 +106,37 @@ module.exports = {
                     dropdownActiveClassDisabled: true,
                 },
                 {
-                    href: "https://github.com/Camberi/firecms",
-                    // label: 'GitHub',
-                    className: "header-github-link",
-                    "aria-label": "GitHub repository",
-                    position: "right"
+                    type: "html",
+                    position: "right",
+                    value: `
+                    <iframe 
+                    style="    transform: translate(0px, 4px);"
+                                src="https://ghbtns.com/github-btn.html?user=Camberi&repo=FireCMS&type=star&count=true&size=large"
+                                frameBorder="0" scrolling="0"
+                                width="140"
+                                height="32" 
+                                title="GitHub"/>
+                    `
                 },
+                // {
+                //     href: "https://github.com/Camberi/firecms",
+                //     // label: 'GitHub',
+                //     className: "header-github-link",
+                //     "aria-label": "GitHub repository",
+                //     position: "right"
+                // },
                 {
                     to: "https://demo.firecms.co",
                     label: "Demo",
-                    // className: "btn shadow-none mr-2 px-6 py-2 font-bold uppercase",
-                    className: "btn mr-3 px-6 py-2 text-white font-bold uppercase bg-primary hover:text-white hover:bg-blue-700",
+                    // className: "btn shadow-none mr-2 px-6 py-2  uppercase",
+                    className: "btn mr-3 px-6 py-2 text-white  uppercase bg-primary hover:text-white hover:bg-blue-700",
                     "aria-label": "Open the demo project",
                     position: "right"
                 },
                 // {
                 //     to: "https://app.firecms.co",
                 //     label: "Sign in",
-                //     className: "btn mr-3 px-6 py-2 text-white font-bold uppercase bg-primary hover:text-white hover:bg-blue-700",
+                //     className: "btn mr-3 px-6 py-2 text-white  uppercase bg-primary hover:text-white hover:bg-blue-700",
                 //     "aria-label": "Go to FireCMS Cloud",
                 //     position: "right"
                 // },
@@ -136,16 +159,20 @@ module.exports = {
                     title: "Links",
                     items: [
                         {
+                            to: "enterprise",
+                            label: "Enterprise",
+                        },
+                        {
+                            to: "https://app.firecms.co/subscriptions",
+                            label: "Manage subscriptions",
+                        },
+                        {
                             label: "Demo",
                             to: "https://demo.firecms.co"
                         },
                         {
                             label: "Blog",
                             to: "blog",
-                        },
-                        {
-                            label: "Camberi",
-                            to: "https://camberi.com"
                         },
                         {
                             label: "Privacy policy",
@@ -192,7 +219,7 @@ module.exports = {
                     ]
                 }
             ],
-            copyright: `MIT © ${new Date().getFullYear()} - camberi`
+            copyright: `MIT © ${new Date().getFullYear()} - FireCMS S.L.`
         },
         prism: {
             theme: require("prism-react-renderer/themes/vsDark")
@@ -213,8 +240,6 @@ module.exports = {
                         },
                         current: {
                             label: "2.0.0-beta",
-                            // path: "2.0.0",
-                            // banner: "unreleased"
                         }
                     },
                 },
@@ -227,7 +252,7 @@ module.exports = {
                 //     ]
                 // },
                 gtag: {
-                    trackingID: process.env.REACT_APP_GTAG_ID
+                    trackingID: process.env.REACT_APP_GTAG_ID ?? "G-D4DQQCW88S"
                 },
                 sitemap: {
                     changefreq: 'weekly',

@@ -18,7 +18,7 @@ import {
     StringSchema
 } from "yup";
 import { enumToObjectEntries } from "../core/util/enums";
-import { hydrateRegExp, isPropertyBuilder } from "../core";
+import { getValueInPath, hydrateRegExp, isPropertyBuilder } from "../core";
 
 // Add custom unique function for array values
 declare module "yup" {
@@ -151,7 +151,7 @@ function getYupStringSchema({
         collection = collection.oneOf(
             enumToObjectEntries(property.enumValues)
                 .map((enumValueConfig) => enumValueConfig.id)
-        );
+        ).nullable(true);
     }
     if (validation) {
         collection = validation.required
@@ -377,7 +377,7 @@ function getYupArraySchema({
                     "Dynamic object validation",
                     "Dynamic object validation error",
                     (object, context) => {
-                        const yupProperty = yupProperties[context.path];
+                        const yupProperty = getValueInPath(yupProperties, context.path);
                         return yupProperty.validate(object);
                     }
                 )

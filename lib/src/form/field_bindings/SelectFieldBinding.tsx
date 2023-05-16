@@ -16,6 +16,7 @@ import { LabelWithIcon } from "../components";
 import { useClearRestoreValue } from "../../hooks";
 import { isEnumValueDisabled } from "../../core/util/enums";
 import { EnumValuesChip } from "../../preview";
+import { getIconForProperty } from "../../core";
 
 type SelectProps<T extends EnumType> = FieldProps<T>;
 
@@ -37,8 +38,7 @@ export function SelectFieldBinding<T extends EnumType>({
                                                            autoFocus,
                                                            touched,
                                                            property,
-                                                           includeDescription,
-                                                           shouldAlwaysRerender
+                                                           includeDescription
                                                        }: SelectProps<T>) {
 
     const enumValues = property.enumValues;
@@ -71,18 +71,21 @@ export function SelectFieldBinding<T extends EnumType>({
         >
 
             <InputLabel id={`${propertyKey}-select-label`}>
-                <LabelWithIcon property={property}/>
+                <LabelWithIcon icon={getIconForProperty(property)}
+                                 title={property.name}/>
             </InputLabel>
 
             <MuiSelect
-                sx={{
-                    minHeight: "64px"
-                }}
+                sx={(theme) => ({
+                    minHeight: "64px",
+                    borderRadius: `${theme.shape.borderRadius}px`
+                })}
                 variant={"filled"}
                 labelId={`${propertyKey}-select-label`}
                 autoFocus={autoFocus}
                 value={value ?? ""}
                 disabled={disabled}
+                disableUnderline={true}
                 endAdornment={
                     property.clearable && <IconButton
                         sx={{
@@ -127,7 +130,7 @@ export function SelectFieldBinding<T extends EnumType>({
             {includeDescription &&
                 <FieldDescription property={property}/>}
 
-            {showError && <FormHelperText>{error}</FormHelperText>}
+            {showError && <FormHelperText error={true}>{error}</FormHelperText>}
 
         </FormControl>
     );

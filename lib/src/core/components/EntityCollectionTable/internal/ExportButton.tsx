@@ -27,7 +27,6 @@ import {
 import { downloadCSV } from "../../../util/csv";
 import { CustomDialogActions } from "../../CustomDialogActions";
 import { resolveCollection } from "../../../util";
-import { useTraceUpdate } from "../../../util/useTraceUpdate";
 
 interface ExportButtonProps<M extends Record<string, any>, UserType extends User> {
     collection: EntityCollection<M>;
@@ -178,7 +177,7 @@ export function ExportButton<M extends Record<string, any>, UserType extends Use
                     <br/>
 
                     {needsToAcceptFetchAllData &&
-                        <Alert elevation={1}
+                        <Alert elevation={3}
                                variant="filled"
                                severity={"warning"}>
                             <div>

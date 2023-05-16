@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { TextareaAutosize } from "@mui/material";
 
 import { useDebounce } from "../../../util";
+import { TextareaAutosize } from "../../fields/TextareaAutosize";
 
 export function TableInput(props: {
     error: Error | undefined;
@@ -29,10 +29,9 @@ export function TableInput(props: {
     // update on external value change
     useEffect(
         () => {
-            if (!focused && value !== internalValue)
+            if (value !== internalValue)
                 setInternalValue(value);
-        },
-        [value, focused]
+        }, [value]
     );
 
     const ref = React.createRef<HTMLTextAreaElement>();
@@ -50,7 +49,6 @@ export function TableInput(props: {
     return (
         <TextareaAutosize
             ref={ref}
-            disabled={disabled}
             style={{
                 padding: 0,
                 margin: 0,

@@ -16,178 +16,169 @@ function FeaturesPanels() {
     const isDarkTheme = colorMode === "dark";
 
     return (
-        <section className={"relative sm:px-6 py-12 md:py-20"}>
+        <section
+            className={ContainerMixin + " px-4 relative sm:px-6 py-16 md:py-28"}>
 
-            <section className={ContainerMixin + " px-4"}>
+            <div
+                className="flex items-center max-w-xl md:max-w-none md:w-full mx-auto mb-4"
+                data-aos="fade-right"
+            >
+                <div className="md:pr-4 lg:pr-12 xl:pr-16">
 
-                    <div
-                        className="flex items-center max-w-xl md:max-w-none md:w-full mx-auto mb-4"
-                        data-aos="fade-right"
-                    >
-                        <div className="md:pr-4 lg:pr-12 xl:pr-16">
+                    <div className={"flex items-center mb-4"}>
 
-                            <div className={"flex items-center mb-4"}>
-
-                                <div
-                                    className="flex items-center justify-center text-white w-10 h-10 bg-gray-800 rounded-full shadow flex-shrink-0 mr-4">
-                                    {lightningIcon}
-                                </div>
-
-                                <h2 className="h1 m-0">
-                                    Batteries included
-                                </h2>
-
-                            </div>
-
-                            <p className="text-xl text-gray-600 dark:text-gray-200">
-                                FireCMS provides all the flexibility you
-                                need with the best UX.
-                                Edit your collections and entities using
-                                both a <b>spreadsheet
-                                view</b> and <b>powerful forms</b>.
-                            </p>
+                        <div
+                            className="flex items-center justify-center text-white w-10 h-10 bg-gray-800 rounded-full shadow flex-shrink-0 mr-4">
+                            {lightningIcon}
                         </div>
+
+                        <h2 className="h1 m-0">
+                            Batteries included
+                        </h2>
 
                     </div>
 
-                    {/*<div*/}
-                    {/*    className="max-w-xl md:max-w-none md:w-full mx-auto lg:col-span-5 mb-8 md:mb-0 md:order-1"*/}
-                    {/*    data-aos="fade-left"*/}
-                    {/*>*/}
-                    {/*    <div className="relative flex flex-col p-4">*/}
-                    {/*        <video*/}
-                    {/*            key={`demo_video_${isDarkTheme}`}*/}
-                    {/*            style={{*/}
-                    {/*                maxHeight: 589,*/}
-                    {/*                aspectRatio: 508 / 589*/}
-                    {/*            }}*/}
-                    {/*            className={"rounded-xl border border-solid dark:border-gray-800 border-gray-200 border-gray-200"}*/}
-                    {/*            width="100%" loop autoPlay muted>*/}
-                    {/*            <source*/}
-                    {/*                src={isDarkTheme ? editingDemoDarkVideo : editingDemoVideo}*/}
-                    {/*                type="video/mp4"/>*/}
-                    {/*        </video>*/}
+                    <p className="text-xl text-gray-600 dark:text-gray-200 text-xl md:text-2xl">
+                        FireCMS provides all the flexibility you
+                        need with the best UX.
+                        Edit your collections and entities using
+                        both a <b>spreadsheet
+                        view</b> and <b>powerful forms</b>.
+                    </p>
+                </div>
 
-                    {/*    </div>*/}
-                    {/*</div>*/}
-            </section>
+            </div>
 
-            <section className={ContainerMixin + " px-4 sm:px-6 my-4"}>
+            {/*<div*/}
+            {/*    className="max-w-xl md:max-w-none md:w-full mx-auto lg:col-span-5 mb-8 md:mb-0 md:order-1"*/}
+            {/*    data-aos="fade-left"*/}
+            {/*>*/}
+            {/*    <div className="relative flex flex-col p-4">*/}
+            {/*        <video*/}
+            {/*            key={`demo_video_${isDarkTheme}`}*/}
+            {/*            style={{*/}
+            {/*                maxHeight: 589,*/}
+            {/*                aspectRatio: 508 / 589*/}
+            {/*            }}*/}
+            {/*            className={"rounded-xl border border-solid dark:border-gray-800 border-gray-200 border-gray-200"}*/}
+            {/*            width="100%" loop autoPlay muted>*/}
+            {/*            <source*/}
+            {/*                src={isDarkTheme ? editingDemoDarkVideo : editingDemoVideo}*/}
+            {/*                type="video/mp4"/>*/}
+            {/*        </video>*/}
+
+            {/*    </div>*/}
+            {/*</div>*/}
+
+            <div
+                className="max-w-sm mx-auto grid gap-6 md:grid-cols-2 lg:grid-cols-3 items-start md:max-w-2xl lg:max-w-none text-xl">
+                <div
+                    data-aos="fade-up"
+                    data-aos-delay="100">
                     <div
-                        className="max-w-sm mx-auto grid gap-6 md:grid-cols-2 lg:grid-cols-3 items-start md:max-w-2xl lg:max-w-none">
-                        <div
-                            data-aos="fade-up"
-                            data-aos-delay="100">
-                            <div
-                                className="relative flex flex-col items-center p-6 bg-white dark:bg-gray-900 rounded border border-solid dark:border-gray-800 border-gray-200">
-                                {iconStars}
-                                <h4 className="text-xl font-bold leading-snug tracking-tight mb-1">
-                                    Data consistency
-                                </h4>
-                                <p className="text-gray-600 dark:text-gray-200 text-center">
-                                    Define schemas for your data types and validation options
-                                </p>
-                            </div>
-                        </div>
+                        className="relative flex flex-col items-center p-6 bg-white dark:bg-gray-900 rounded border border-solid dark:border-gray-800 border-gray-200">
+                        {iconStars}
+                        <h4 className="text-xl font-bold leading-snug tracking-tight mb-1">
+                            Consistent Data Management
+                        </h4>
+                        <p className="text-gray-600 dark:text-gray-200 text-center">
+                            Establish schemas for your data types and set
+                            validation options
+                        </p>
+                    </div>
+                </div>
 
-                        <div
-                            data-aos="fade-up"
-                            data-aos-delay="150">
-                            <div
-                                className="relative flex flex-col items-center p-6 bg-white dark:bg-gray-900 rounded border border-solid dark:border-gray-800 border-gray-200">
-                                {gridIcon}
-                                <h4 className="text-xl font-bold leading-snug tracking-tight mb-1">
-                                    Advanced editing
-                                </h4>
-                                <p className="text-gray-600 dark:text-gray-200 text-center">
-                                    Spreadsheet-like inline editing, powerful
-                                    forms, files storage, entity references...
-                                </p>
-                            </div>
-                        </div>
+                <div
+                    data-aos="fade-up"
+                    data-aos-delay="150">
+                    <div
+                        className="relative flex flex-col items-center p-6 bg-white dark:bg-gray-900 rounded border border-solid dark:border-gray-800 border-gray-200">
+                        {gridIcon}
+                        <h4 className="text-xl font-bold leading-snug tracking-tight mb-1">
+                            Sophisticated Editing Tools
+                        </h4>
+                        <p className="text-gray-600 dark:text-gray-200 text-center">
+                            Spreadsheet-style editing, robust forms,
+                            file storage, entity references...
+                        </p>
+                    </div>
+                </div>
 
-                        <div
-                            data-aos="fade-up"
-                            data-aos-delay="200">
-                            <div
-                                className="relative flex flex-col items-center p-6 bg-white dark:bg-gray-900 rounded border border-solid dark:border-gray-800 border-gray-200">
-                                {iconDoor}
-                                <h4 className="text-xl font-bold leading-snug tracking-tight mb-1">
-                                    Role system
-                                </h4>
-                                <p className="text-gray-600 dark:text-gray-200 text-center">
-                                    Define different app configurations based
-                                    on the logged user
-                                </p>
-                            </div>
-
-                        </div>
-
-                        <div
-                            data-aos="fade-up"
-                            data-aos-delay="100">
-                            <div
-                                className="relative flex flex-col items-center p-6 bg-white dark:bg-gray-900 rounded border border-solid dark:border-gray-800 border-gray-200">
-                                {iconCards}
-                                <h4 className="text-xl font-bold leading-snug tracking-tight mb-1">
-                                    Customization
-                                </h4>
-                                <p className="text-gray-600 dark:text-gray-200 text-center">
-                                    Custom form fields, hooks and full views
-                                    based
-                                    on React
-                                </p>
-                            </div>
-                        </div>
-
-                        <div
-                            data-aos="fade-up"
-                            data-aos-delay="150">
-                            <div
-                                className="relative flex flex-col items-center p-6 bg-white dark:bg-gray-900 rounded border border-solid dark:border-gray-800 border-gray-200">
-                                {iconArrows}
-                                <h4 className="text-xl font-bold leading-snug tracking-tight mb-1">
-                                    Subcollection support
-                                </h4>
-                                <p className="text-gray-600 dark:text-gray-200 text-center">
-                                    Complete navigation for collections under
-                                    other
-                                    entities
-                                </p>
-                            </div>
-                        </div>
-                        <div
-                            data-aos="fade-up"
-                            data-aos-delay="200">
-                            <div
-                                className="relative flex flex-col items-center p-6 bg-white dark:bg-gray-900 rounded border border-solid dark:border-gray-800 border-gray-200">
-
-                                {iconRadar}
-
-                                <h4 className="text-xl font-bold leading-snug tracking-tight mb-1">
-                                    Real time support
-                                </h4>
-                                <p className="text-gray-600 dark:text-gray-200 text-center">
-                                    In every view of your CMS, ideal for
-                                    background
-                                    updates
-                                </p>
-                            </div>
-                        </div>
+                <div
+                    data-aos="fade-up"
+                    data-aos-delay="200">
+                    <div
+                        className="relative flex flex-col items-center p-6 bg-white dark:bg-gray-900 rounded border border-solid dark:border-gray-800 border-gray-200">
+                        {iconDoor}
+                        <h4 className="text-xl font-bold leading-snug tracking-tight mb-1">
+                            Role-Based System
+                        </h4>
+                        <p className="text-gray-600 dark:text-gray-200 text-center">
+                            Configure app settings according to the logged-in
+                            user
+                        </p>
                     </div>
 
-                    <div
-                        className="max-w-3xl mx-auto text-center py-8 md:py-12">
-                        <a
-                            className={CTAOutlinedButtonMixin + " mx-auto"}
-                            href={useBaseUrl("features/")}
-                        >
-                            See all features
-                            <CTACaret/>
-                        </a>
-                    </div>
+                </div>
 
-            </section>
+                <div
+                    data-aos="fade-up"
+                    data-aos-delay="100">
+                    <div
+                        className="relative flex flex-col items-center p-6 bg-white dark:bg-gray-900 rounded border border-solid dark:border-gray-800 border-gray-200">
+                        {iconCards}
+                        <h4 className="text-xl font-bold leading-snug tracking-tight mb-1">
+                            Flexible Customization
+                        </h4>
+                        <p className="text-gray-600 dark:text-gray-200 text-center">
+                            Incorporate custom form fields, hooks, and full views based on React
+                        </p>
+                    </div>
+                </div>
+
+                <div
+                    data-aos="fade-up"
+                    data-aos-delay="150">
+                    <div
+                        className="relative flex flex-col items-center p-6 bg-white dark:bg-gray-900 rounded border border-solid dark:border-gray-800 border-gray-200">
+                        {iconArrows}
+                        <h4 className="text-xl font-bold leading-snug tracking-tight mb-1">
+                            Subcollection Compatibility
+                        </h4>
+                        <p className="text-gray-600 dark:text-gray-200 text-center">
+                            Seamless navigation for collections within other entities
+                        </p>
+                    </div>
+                </div>
+                <div
+                    data-aos="fade-up"
+                    data-aos-delay="200">
+                    <div
+                        className="relative flex flex-col items-center p-6 bg-white dark:bg-gray-900 rounded border border-solid dark:border-gray-800 border-gray-200">
+
+                        {iconRadar}
+
+                        <h4 className="text-xl font-bold leading-snug tracking-tight mb-1">
+                            Real-Time Support
+                        </h4>
+                        <p className="text-gray-600 dark:text-gray-200 text-center">
+                            Live updates in every view of your CMS, ideal for background updates
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                className="max-w-3xl mx-auto text-center py-8 md:py-12">
+                <a
+                    className={CTAOutlinedButtonMixin + " mx-auto"}
+                    href={useBaseUrl("features/")}
+                >
+                    See all features
+                    <CTACaret/>
+                </a>
+            </div>
+
         </section>
     );
 }
